@@ -1,10 +1,12 @@
-import './App.css';
+import '../App.css';
 import Scene from './Scene';
+
 function App() {
   return (
-<>
-  <Scene />
-</>
+
+    <>
+        <Scene />
+    </>
   );
 }
 

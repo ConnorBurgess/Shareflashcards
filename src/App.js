@@ -1,11 +1,9 @@
 import './App.css';
-
+import Scene from './Scene';
 function App() {
   return (
 <>
-<div>
-  Hello world
-</div>
+  <Scene />
 </>
   );
 }

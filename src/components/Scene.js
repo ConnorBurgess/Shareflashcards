@@ -10,15 +10,22 @@ class Scene extends React.Component {
     const Engine = Matter.Engine,
       Render = Matter.Render,
       World = Matter.World,
+      Pairs = Matter.Pairs,
       Bodies = Matter.Bodies,
       Mouse = Matter.Mouse,
-      MouseConstraint = Matter.MouseConstraint;
-    //Generate number between 0 and 1000
-    function random(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+      Events = Matter.Events,
+      MouseConstraint = Matter.MouseConstraint,
+      Composite = Matter.Composite;
+
+    //Handle keypress for starting card flow
+    const handleKeyPress = (event) => {
+      if (event.key === 'Enter') {
+        console.log('Card flow started ')
+      }
     }
+
+    setTimeout(() => console.log('Hello, World!'), 6000)
+
     var engine = Engine.create({
     });
 
@@ -54,16 +61,16 @@ class Scene extends React.Component {
 
     //Set world gravity
     engine.world.gravity.y = 0.01;
-
+    console.log(engine.world);
     //Add platforms
-    World.add(engine.world, [
+    Composite.add(engine.world, [
       //generate card platform
-      Bodies.rectangle(600, 600, 600, 500, { isStatic: true }),
+      // Bodies.rectangle(600, 600, 600, 500, { isStatic: true }),
       //place card platform
       Bodies.rectangle(800, 200, 300, 30, { isStatic: true, render: { fillStyle: '#f6392b' } }),
 
     ]);
-    World.add(engine.world, [ballA, ballB]);
+    Composite.add(engine.world, [ballA, ballB]);
 
     // Implement mouse control
     var mouse = Mouse.create(render.canvas),
@@ -76,12 +83,13 @@ class Scene extends React.Component {
           }
         }
       });
-
-    World.add(engine.world, mouseConstraint);
-    let idArray = [5, 7, 9, 10, 4, 99, 50, 20, 40, 44, 66, 999, 335, 352, 2414, 111, "I'm a flashcard", 10]
+    //Detect collision
+    
+    Composite.add(engine.world, mouseConstraint);
+    let idArray = [5, 7, 9, 10, 4, 99, 50, 20, 40, 44, 66, "one more thing", "Check this out", "lol" , "Cool", "JavaScript", "I'm a flashcard", 10]
     let cardArray = [];
     let xParam = 1000;
-
+    
     for (let i = 0; i < idArray.length; i++) {
       xParam = Math.random() * 1000 + 1;
       let newCard = Bodies.rectangle(xParam, 0, 100, 50, {
@@ -95,27 +103,52 @@ class Scene extends React.Component {
       })
       cardArray.push(newCard);
     }
+
     let cardsLeft = cardArray.length
+
     Matter.Events.on(mouseConstraint, "mousedown", function (event) {
       //Generate card in World
       console.log(cardsLeft);
-      if(cardsLeft > 0) {
-      World.add(engine.world, cardArray[cardsLeft - 1]);
-      cardArray.pop();
-      cardsLeft--;
-      console.log(cardsLeft);
-      console.log(cardArray);
-      }  
+      if (cardsLeft > 0) {
+        Composite.add(engine.world, cardArray[cardsLeft - 1]);
+        cardArray.pop();
+        cardsLeft--;
+      }
       // }
     });
-
+    
     Engine.run(engine);
-
     Render.run(render);
-  }
+    
+    //Implement collision
+    Events.on(engine, "collisionStart", function(event) {
+      // console.log(engine.World);
+      // console.log(Composite);
 
+      //Freezes all flashcards in world (make it a button)
+      engine.world.bodies.forEach((item) => {
+        console.log(item);
+        item.isSleeping = true;
+      })
+      // Composite.removeBody(engine.world, event.source.pairs.list[0].bodyA);
+      console.log(event);
+      if(event.source.pairs.collisionActive[0] != undefined) {
+      event.source.pairs.collisionActive[0].bodyA.isSleeping = true;
+      console.log("lol");
+      }
+      console.log(event.source.pairs)
+
+      // console.log(event.source.pairs.list[0].bodyA)
+      }); 
+  }
+  
   render() {
-    return <div ref="scene" />;
+    return (
+      <>
+        <div ref="scene" />
+
+      </>
+    );
   }
 }
 export default Scene;

@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/App';
-import '@fontsource/roboto';
 import NavBar from './components/NavBar';
+import ToolTip from './components/ToolTip';
+import '@fontsource/roboto';
 
 ReactDOM.render(
   <React.StrictMode>
     <NavBar />
+    <ToolTip />
     <App />
   </React.StrictMode>,
   document.getElementById('root')

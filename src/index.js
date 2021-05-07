@@ -9,7 +9,7 @@ import '@fontsource/roboto';
 ReactDOM.render(
   <React.StrictMode>
     <NavBar />
-    <ToolTip />
+    {/* <ToolTip /> */}
     <App />
   </React.StrictMode>,
   document.getElementById('root')

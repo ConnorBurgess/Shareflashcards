@@ -4,8 +4,27 @@ import Matter from "matter-js";
 class Scene extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { visible: false };
+    this.state = { 
+      visible: false,
+      worldBodies: null };
+    
   }
+  //Handle keypress for starting card flow
+   handleKeyPress = (event) => {
+    if (event.key === 's') {
+      console.log('Card flow started ')
+    }
+    if (event.key === 'f') {
+      this.state.worldBodies.forEach((item) => {
+        item.isSleeping = true;
+      })
+    }
+    if (event.key === 'g') {
+      this.state.worldBodies.forEach((item) => {
+        item.isSleeping = false;
+      })
+    }
+    }
   componentDidMount() {
     const Engine = Matter.Engine,
       Render = Matter.Render,
@@ -16,19 +35,15 @@ class Scene extends React.Component {
       Events = Matter.Events,
       MouseConstraint = Matter.MouseConstraint,
       Composite = Matter.Composite;
-
-    //Handle keypress for starting card flow
-    const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
-        console.log('Card flow started ')
-      }
-    }
-
-    setTimeout(() => console.log('Hello, World!'), 6000)
-
-    var engine = Engine.create({
-    });
-
+      //Add keydown events
+      document.addEventListener("keydown", this.handleKeyPress, false);
+      
+      setTimeout(() => console.log('Hello, World!'), 6000)
+      
+      var engine = Engine.create({
+      });
+      
+      this.state.worldBodies = engine.world.bodies
     var render = Render.create({
       element: this.refs.scene,
       engine: engine,
@@ -125,16 +140,10 @@ class Scene extends React.Component {
       // console.log(engine.World);
       // console.log(Composite);
 
-      //Freezes all flashcards in world (make it a button)
-      engine.world.bodies.forEach((item) => {
-        console.log(item);
-        item.isSleeping = true;
-      })
       // Composite.removeBody(engine.world, event.source.pairs.list[0].bodyA);
       console.log(event);
       if(event.source.pairs.collisionActive[0] != undefined) {
       event.source.pairs.collisionActive[0].bodyA.isSleeping = true;
-      console.log("lol");
       }
       console.log(event.source.pairs)
 

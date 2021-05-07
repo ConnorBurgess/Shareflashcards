@@ -6,6 +6,8 @@ import NavBar from './components/NavBar';
 import ToolTip from './components/ToolTip';
 import '@fontsource/roboto';
 
+// import firebase from './firebase'
+
 ReactDOM.render(
   <>
     <NavBar />

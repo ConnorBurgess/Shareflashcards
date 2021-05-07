@@ -1,5 +1,5 @@
 import '../App.css';
-import Scene from './Scene';
+import {Scene} from './Scene';
 
 function App() {
   return (

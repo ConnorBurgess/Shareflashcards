@@ -7,11 +7,11 @@ import ToolTip from './components/ToolTip';
 import '@fontsource/roboto';
 
 ReactDOM.render(
-  <React.StrictMode>
+  <>
     <NavBar />
     {/* <ToolTip /> */}
     <App />
-  </React.StrictMode>,
+  </>,
   document.getElementById('root')
 );
 

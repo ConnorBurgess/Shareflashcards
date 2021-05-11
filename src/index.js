@@ -11,7 +11,6 @@ import '@fontsource/roboto';
 ReactDOM.render(
   <>
     <NavBar />
-    {/* <ToolTip /> */}
     <App />
   </>,
   document.getElementById('root')

@@ -1,10 +1,10 @@
 import '../App.css';
-import {Scene} from './Scene';
-
+import CardsControl from './CardsControl'
 function App() {
+
   return (
     <>
-        <Scene />
+        <CardsControl />
     </>
   );
 }

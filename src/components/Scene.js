@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
 import ReactDOM from "react-dom";
 import Matter from "matter-js";
-import image from '../img/card.svg'
-import testCard from '../img/testcard2.png'
-
+import image from '../img/card.svg';
+import testCard from '../img/testcard2.png';
+import background from '../img/background.jpg';
+import ToolTip from './ToolTip';
 // class Scene extends React.Component {
 //   constructor(props) {
 //     super(props);
@@ -17,82 +18,85 @@ import testCard from '../img/testcard2.png'
 //       addCardToWorld: null
 //     }
 //   }
-export const Scene = () => {
+function Scene() {
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
+  const [showAddCard, SetShowAddCard] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [generateCards, setGenerateCards] = useState(false);
+  const [cardArray, setCardArray] = useState([]);
+  //  Handle keypress for starting card flow
+  const handleKeyPress = (event) => {
+    if (event.key === 's') {
+      // this.handleDeckGeneration();
+      console.log("s pressed");
+      if (event.key === 'f') {
+        // this.state.worldBodies.forEach((item) => {
+        //   item.isSleeping = true;
+        // })
+      }
+      if (event.key === 'g') {
+        // this.state.worldBodies.forEach((item) => {
+        //   item.isSleeping = false;
+        // })
+      }
+    }
+  }
+  const handleDeckGeneration = () => {
+
+    for (let i = 0; i < this.state.idArray.length; i++) {
+      //add to a randomize card handler
+      this.state.generatedCard.id = Math.floor(Math.random() * 1000 + 1);
+      console.log("generated card = " + this.state.generatedCard);
+
+      //end randomize card handler
+      this.state.cardArray.push(this.state.generatedCard);
+      // Object.keys(this.state.generatedCard.position.x).forEach((prop)=> console.log(prop));
 
 
-  //Handle keypress for starting card flow
-  // const handleKeyPress = (event) => {
-  //   if (event.key === 's') {
-  //     this.handleDeckGeneration();
-  //   }
-  //   if (event.key === 'f') {
-  //     this.state.worldBodies.forEach((item) => {
-  //       item.isSleeping = true;
-  //     })
-  //   }
-  //   if (event.key === 'g') {
-  //     this.state.worldBodies.forEach((item) => {
-  //       item.isSleeping = false;
-  //     })
-  //   }
-  // }
-  // const handleDeckGeneration = () => {
+    }
 
-  //   for (let i = 0; i < this.state.idArray.length; i++) {
-  //     this.state.xParam = Math.random() * 1000 + 1;
-  //     //add to a randomize card handler
-  //     this.state.generatedCard.id = Math.floor(Math.random() * 1000 + 1);
-  //     console.log("generated card = " + this.state.generatedCard);
 
-  //     //end randomize card handler
-  //     this.state.cardArray.push(this.state.generatedCard);
-  //     // Object.keys(this.state.generatedCard.position.x).forEach((prop)=> console.log(prop));
+  }
 
-  //     console.log(this.state.cardArray);
-  //   }
-  //   this.state.addCardToWorld();
-  //   this.state.cardArray.pop();
-  //   this.state.addCardToWorld();
-
-  // }
+  const generateCard = () => {
+    Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
+      isStatic: false,
+      render: {
+        fillStyle: 'blue',
+        strokeStyle: 'red',
+        lineWidth: 8,
+        sprite: {
+          texture: testCard
+        }
+      },
+      id: 5
+    });
+  }
   // componentDidMount() {
-    useEffect(() => {
+  useEffect(() => {
     let Engine = Matter.Engine,
-    Render = Matter.Render,
-    Runner = Matter.Runner,
-    World = Matter.World,
-    Common = Matter.Common,
-    Pairs = Matter.Pairs,
-    Bodies = Matter.Bodies,
-    Mouse = Matter.Mouse,
-    Events = Matter.Events,
-    MouseConstraint = Matter.MouseConstraint,
-    Composite = Matter.Composite;
+      Render = Matter.Render,
+      Runner = Matter.Runner,
+      World = Matter.World,
+      Common = Matter.Common,
+      Pairs = Matter.Pairs,
+      Bodies = Matter.Bodies,
+      Mouse = Matter.Mouse,
+      Events = Matter.Events,
+      MouseConstraint = Matter.MouseConstraint,
+      Composite = Matter.Composite;
 
     //Add keydown events
-    // document.addEventListener("keydown", handleKeyPress, false);
-    
+    document.addEventListener("keydown", handleKeyPress, false);
+
     setTimeout(() => console.log('Hello, World!'), 6000)
-    
+
     let engine = Engine.create({});
-    
+
     //Set state so can be edited in handlers
     // this.setState({worldBodies : engine.world.bodies, 
-    //   generatedCard : Bodies.rectangle(this.state.xParam, 0, 70, 100, {
-    //     isStatic: false,
-    //     render: {
-    //       fillStyle: 'blue',
-    //       strokeStyle: 'red',
-    //       lineWidth: 8,
-    //       sprite: {
-    //         texture: testCard
-    //       }
-    //     },
-    //     // id: this.state.idArray[i]
-    //   }) 
-    // });
+
     //Add new card to world state
     // this.setState({addCardToWorld : () => {Composite.add(engine.world, this.state.cardArray[this.state.cardArray.length - 1])},});
     let render = Render.create({
@@ -102,7 +106,8 @@ export const Scene = () => {
       options: {
         width: 1200,
         height: 600,
-        background: image,
+        showIds: true,
+        background: background,
         wireframes: false,
       },
     })
@@ -111,8 +116,8 @@ export const Scene = () => {
     //   engine: engine,
     //   canvas: canvasRef,
     //   options: {
-        // width: 1200,
-        // height: 600,
+    // width: 1200,
+    // height: 600,
     //     wireframes: false,
     //     // showIds: true,
     //     background: false,
@@ -162,14 +167,14 @@ export const Scene = () => {
     // console.log(this.state.cardArray);
     //   console.log(this.state);
 
-    Matter.Events.on(mouseConstraint, "mousedown",  (event) => {
+    Matter.Events.on(mouseConstraint, "mousedown", (event) => {
       //Generate card in World
       // if (this.state.cardArray.length > 0) {
       //   setTimeout(() => {
       //     if (this.state.cardArray.length > 0) {
-        console.log("test")
-            // console.log(this.state.addCardToWorld())
-            // this.state.cardArray.pop();
+      console.log("test")
+      // console.log(this.state.addCardToWorld())
+      // this.state.cardArray.pop();
       //     }
       //   }, 1000)
       // }
@@ -179,7 +184,7 @@ export const Scene = () => {
       // }
     });
 
-    
+
     //Implement collision
     Events.on(engine, "collisionStart", function (event) {
       // Composite.removeBody(engine.world, event.source.pairs.list[0].bodyA);
@@ -188,24 +193,31 @@ export const Scene = () => {
         event.source.pairs.collisionActive[0].bodyA.isSleeping = true;
       }
       console.log(event.source.pairs)
-      
+
       // console.log(event.source.pairs.list[0].bodyA)
     });
     //Componentdidmount ended here
     Runner.run(engine);
     Render.run(render);
   }, [])
-    // }
+  // }
 
-    return (
+  return (
+    <div className="container flex justify-start border-4 border-red-800">
       <div
         ref={boxRef}
         style={{
-          width: 300,
-          height: 300,
+          width: 1200,
+          height: 600,
         }}
       >
-        <canvas ref={canvasRef} />
       </div>
-    )
-  }
+      <div className="border-blue-800">
+        <canvas
+          ref={canvasRef} />
+      </div>
+          </div>
+  )
+}
+
+export default Scene;

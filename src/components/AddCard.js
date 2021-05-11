@@ -70,9 +70,12 @@ const AddCard = (props) => {
                   />
                 </p>
               </div>
-              <div class="md:grid md:grid-cols-2 hover:bg-green-50 md:space-y-0 space-y-1 p-4 border-b">
+              <div class="md:grid md:grid-cols-2 hover:bg-green-50 md:space-y-0 space-y-1 p-4 border-b justify-items-center">
                 <p>
                   <button type='submit'>Add Card</button>
+                </p>
+                <p className="hover:bg-red-50"> 
+                <button onClick={() => props.setShowAddCard(false)} type='click'>Close</button>
                 </p>
               </div>
             </div>

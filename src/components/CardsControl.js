@@ -4,13 +4,15 @@ import ToolTip from './ToolTip';
 import AddCard from './AddCard';
 import {firestore} from '../firebase';
 import react, {useState, useEffect} from 'react';
-function App() {
+function CardsControl() {
   const [showToolTip, setShowToolTip] = useState(true);
   const [showAddCard, setShowAddCard] = useState(true);
   const [cardArray, setCardArray] = useState([]);
   const [visibleComponent, setVisibleComponent] = useState(null);
-  const handleToolTipDisplaying = () => {
-    setShowToolTip(!showToolTip);
+  //handlers for displaying components
+  const handleToolTipDisplaying = (val) => {
+    console.log(val);
+    setShowToolTip(val);
     console.log(showToolTip);
   }
 
@@ -36,19 +38,24 @@ function App() {
   });
   }
 
-  useEffect(() => {
-  if (showToolTip != false) {
-    setVisibleComponent(<ToolTip handleToolTipDisplaying = {handleToolTipDisplaying}/>)
-  }
-}, [showToolTip]); 
+  //not needed
+//   useEffect(() => {
+//   if (showToolTip != false) {
+//     setVisibleComponent(<ToolTip handleToolTipDisplaying = {handleToolTipDisplaying}/>)
+//   }
+//   else {
+//     setVisibleComponent(null);
+//   }
+// }, [showToolTip]); 
   return (
+    
     <>
-        {visibleComponent}
-        <Scene getCards = {handleGetCards}/>
-        <div className="absolute">
-        <AddCard addCard = {handleAddCard}/>
+        <div className=" border-green-400 border-4">
+        <div className="left-52 z-50 absolute border-red-400 border-4"> {showToolTip ? <ToolTip handleToolTipDisplaying = {handleToolTipDisplaying}/> : null}</div>
+        <div className="z-50 absolute top-9 left-2/4"> {showAddCard ? <AddCard addCard = {handleAddCard} setShowAddCard = {setShowAddCard}/> : null} </div>
+        <div className="absolute z-0"> <Scene getCards = {handleGetCards}/></div>
         </div>
     </>
   );
 }
-export default App;
+export default CardsControl;

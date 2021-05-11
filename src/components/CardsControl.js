@@ -7,6 +7,7 @@ import react, {useState, useEffect} from 'react';
 function App() {
   const [showToolTip, setShowToolTip] = useState(true);
   const [showAddCard, setShowAddCard] = useState(true);
+  const [cardArray, setCardArray] = useState([]);
   const [visibleComponent, setVisibleComponent] = useState(null);
   const handleToolTipDisplaying = () => {
     setShowToolTip(!showToolTip);
@@ -24,6 +25,17 @@ function App() {
     })
   }
 
+  const handleGetCards  = () => {
+    firestore.collection("cards").get().then((entry) => {
+    entry.forEach( doc => {
+      //push card data to cardArray for generating cards in matter.js
+      setCardArray(cardArray.push(doc.data()))
+      console.log(cardArray);
+    }
+    )
+  });
+  }
+
   useEffect(() => {
   if (showToolTip != false) {
     setVisibleComponent(<ToolTip handleToolTipDisplaying = {handleToolTipDisplaying}/>)
@@ -32,7 +44,7 @@ function App() {
   return (
     <>
         {visibleComponent}
-        <Scene />
+        <Scene getCards = {handleGetCards}/>
         <div className="absolute">
         <AddCard addCard = {handleAddCard}/>
         </div>

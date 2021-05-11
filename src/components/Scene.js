@@ -5,6 +5,8 @@ import image from '../img/card.svg';
 import testCard from '../img/testcard2.png';
 import background from '../img/background.jpg';
 import ToolTip from './ToolTip';
+import {firestore} from '../firebase';
+
 // class Scene extends React.Component {
 //   constructor(props) {
 //     super(props);
@@ -18,7 +20,7 @@ import ToolTip from './ToolTip';
 //       addCardToWorld: null
 //     }
 //   }
-function Scene() {
+function Scene(props) {
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
   const [showAddCard, SetShowAddCard] = useState(false);
@@ -28,6 +30,7 @@ function Scene() {
   //  Handle keypress for starting card flow
   const handleKeyPress = (event) => {
     if (event.key === 's') {
+      props.getCards();
       // this.handleDeckGeneration();
       console.log("s pressed");
       if (event.key === 'f') {

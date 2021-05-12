@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 const ToolTip = (props) => (
-  <div className="flex items-center justify-center py-8 px-4 ab">
-    <div className="md:w-80 rounded shadow-lg p-6  dark:bg-gray-800 bg-white">
+  <div className="flex items-center justify-center py-8 px-4 absolute">
+    <div className="md:w-80  rounded shadow-lg p-6 dark:bg-gray-800 bg-white ">
       <div className="flex items-center ">
         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none">
           <path d="M5 12L10 17L20 7" stroke="#22C55E" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />

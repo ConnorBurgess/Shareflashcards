@@ -3,7 +3,6 @@ const AddCard = (props) => {
     <>
       <form onSubmit={props.addCard}>
         <div class="min-h-screen flex items-center justify-center px-4 ab">
-
           <div class="max-w-4xl  bg-white w-full rounded-lg shadow-xl">
             <div class="p-4 border-b">
               <h2 class="text-2xl ">

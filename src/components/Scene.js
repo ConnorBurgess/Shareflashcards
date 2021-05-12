@@ -5,21 +5,24 @@ import image from '../img/card.svg';
 import testCard from '../img/testcard2.png';
 import background from '../img/background.jpg';
 import ToolTip from './ToolTip';
-import {firestore} from '../firebase';
+import { firestore } from '../firebase';
+import { gsap } from "gsap";
 
-// class Scene extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       visible: false,
-//       worldBodies: null,
-//       idArray: [5, 7, 9, 10, 4, 99, 50, 20, 40, 44, 66, "I'm a card", 10],
-//       cardArray: [],
-//       xParam: 1000,
-//       generatedCard: null,
-//       addCardToWorld: null
-//     }
-//   }
+const floatingCardStyle = {
+    position: "absolute",
+    width: "100px",
+    height: "100px",
+    top: "0",
+    left: "0",
+    background: "#cb4b16",
+    borderRadius: "80%",
+    backfaceVisibility: "hidden",
+    pointerEvents: "none",
+    opacity: "0.5",
+  }
+
+
+
 function Scene(props) {
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
@@ -27,6 +30,7 @@ function Scene(props) {
   const [showHelp, setShowHelp] = useState(false);
   const [generateCards, setGenerateCards] = useState(false);
   const [cardArray, setCardArray] = useState([]);
+
   //  Handle keypress for starting card flow
   const handleKeyPress = async (event) => {
     if (event.key === 's') {
@@ -46,22 +50,6 @@ function Scene(props) {
       }
     }
   }
-  const handleDeckGeneration = () => {
-
-    for (let i = 0; i < this.state.idArray.length; i++) {
-      //add to a randomize card handler
-      this.state.generatedCard.id = Math.floor(Math.random() * 1000 + 1);
-      console.log("generated card = " + this.state.generatedCard);
-
-      //end randomize card handler
-      this.state.cardArray.push(this.state.generatedCard);
-      // Object.keys(this.state.generatedCard.position.x).forEach((prop)=> console.log(prop));
-
-
-    }
-
-
-  }
 
   const generateCard = () => {
     Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
@@ -77,30 +65,47 @@ function Scene(props) {
       id: 5
     });
   }
-  // componentDidMount() {
   useEffect(() => {
     let Engine = Matter.Engine,
-      Render = Matter.Render,
-      Runner = Matter.Runner,
-      World = Matter.World,
-      Common = Matter.Common,
-      Pairs = Matter.Pairs,
-      Bodies = Matter.Bodies,
-      Mouse = Matter.Mouse,
-      Events = Matter.Events,
-      MouseConstraint = Matter.MouseConstraint,
-      Composite = Matter.Composite;
-
+    Render = Matter.Render,
+    Runner = Matter.Runner,
+    World = Matter.World,
+    Common = Matter.Common,
+    Pairs = Matter.Pairs,
+    Bodies = Matter.Bodies,
+    Mouse = Matter.Mouse,
+    Events = Matter.Events,
+    MouseConstraint = Matter.MouseConstraint,
+    Composite = Matter.Composite;
+    
     //Add keydown events
     document.addEventListener("keydown", handleKeyPress, false);
+    console.log(this)
+    
 
-    setTimeout(() => console.log('Hello, World!'), 6000)
+    function onMouseMove(event) {
+      console.log(this);
+      const follower = this.querySelector('#floating-card')
+      console.log(follower)
+
+      gsap.to(follower, 0.3, {
+        x: event.offsetX,
+        y: event.offsetY,
+        ease: "power4.out"
+    })
+    }
+    //Add listeners to create div on mouse movement
+    const scene = document.querySelector('#scene')
+    scene.addEventListener('mousemove', onMouseMove)
+
+    gsap.set('#floating-card', {
+      xPercent: -50,
+      yPercent: -50
+  })
 
     let engine = Engine.create({});
-
-    //Set state so can be edited in handlers
-    // this.setState({worldBodies : engine.world.bodies, 
-
+    
+    
     //Add new card to world state
     // this.setState({addCardToWorld : () => {Composite.add(engine.world, this.state.cardArray[this.state.cardArray.length - 1])},});
     let render = Render.create({
@@ -149,9 +154,9 @@ function Scene(props) {
     engine.world.gravity.y = 0.01;
     console.log(engine.world);
 
-    //Add red platform
+    //Add platform
     Composite.add(engine.world, [
-      Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: 'white', strokeStyle: 'red' } }),
+      Bodies.rectangle(800, 550, 200, 30, { isStatic: false, render: { fillStyle: 'white', strokeStyle: 'red' } }),
 
     ]);
 
@@ -204,10 +209,15 @@ function Scene(props) {
     Runner.run(engine);
     Render.run(render);
   }, [])
-  // }
+
+  //Check if current deck has been modified, if it has then create new cards in scene
+  useEffect(() => {
+    console.log("currentdeck" + props.currentDeck);
+  }, [props.currentDeck]);
 
   return (
-    <div className="container flex justify-start border-4 border-red-800">
+    <div id="scene" className="container flex justify-start border-4 border-red-800">
+      <div id="floating-card" style={floatingCardStyle}>Test flashcard</div>
       <div
         ref={boxRef}
         style={{
@@ -216,11 +226,11 @@ function Scene(props) {
         }}
       >
       </div>
-      <div id ="canvas" className="border-blue-800">
+      <div id="canvas" className="border-blue-800">
         <canvas
           ref={canvasRef} />
       </div>
-          </div>
+    </div>
   )
 }
 

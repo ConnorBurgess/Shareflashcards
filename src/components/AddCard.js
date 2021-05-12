@@ -1,5 +1,4 @@
 const AddCard = (props) => {
-  console.log("props" + props.addCard);
   return (
     <>
       <form onSubmit={props.addCard}>
@@ -11,7 +10,7 @@ const AddCard = (props) => {
                 Add a new card
             </h2>
               <p class="text-sm text-gray-500">
-                Send a card to your friend or leave it for someone to discover
+                Send a card to friend or leave it for others
             </p>
             </div>
             <div>

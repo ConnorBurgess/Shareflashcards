@@ -28,9 +28,10 @@ function Scene(props) {
   const [generateCards, setGenerateCards] = useState(false);
   const [cardArray, setCardArray] = useState([]);
   //  Handle keypress for starting card flow
-  const handleKeyPress = (event) => {
+  const handleKeyPress = async (event) => {
     if (event.key === 's') {
-      props.getCards();
+      await props.getCards();
+      await props.generateDeck();
       // this.handleDeckGeneration();
       console.log("s pressed");
       if (event.key === 'f') {
@@ -107,10 +108,10 @@ function Scene(props) {
       engine: engine,
       canvas: canvasRef.current,
       options: {
-        width: 1200,
-        height: 600,
+        width: window.innerWidth,
+        height: window.innerHeight,
         showIds: true,
-        background: background,
+        background: "rgb(75,85,99)",
         wireframes: false,
       },
     })
@@ -150,7 +151,7 @@ function Scene(props) {
 
     //Add red platform
     Composite.add(engine.world, [
-      Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: '#f6392b' } }),
+      Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: 'white', strokeStyle: 'red' } }),
 
     ]);
 
@@ -215,7 +216,7 @@ function Scene(props) {
         }}
       >
       </div>
-      <div className="border-blue-800">
+      <div id ="canvas" className="border-blue-800">
         <canvas
           ref={canvasRef} />
       </div>

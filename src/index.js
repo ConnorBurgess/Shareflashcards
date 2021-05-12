@@ -10,7 +10,6 @@ import '@fontsource/roboto';
 
 ReactDOM.render(
   <>
-    <NavBar />
     <App />
   </>,
   document.getElementById('root')

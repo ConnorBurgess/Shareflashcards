@@ -34,6 +34,10 @@ function CardsControl() {
     })
   }
 
+  const handleSignUp = userInfo => {
+    console.log("test")
+  }
+
   const handleGetCards = async () => {
     await firestore.collection("cards").get().then((entry) => {
     entry.forEach( doc => {
@@ -56,6 +60,8 @@ function CardsControl() {
 }
   console.log(currentDeck);
   }
+
+//Generates a random username in SignUp component
   const generateRandomName = () => {
     let firstArr = ["ruthless", "smart", "eager", "envious", "energetic", "joyous", "shiny", "sleepy"]
     let secondArr =["buttercotch", "sardine", "iguana", "walrus", "rhinoserus", "kitten", "albatross"]
@@ -84,7 +90,7 @@ function CardsControl() {
         <div className=" border-green-400 border-4">
         <div className="left-52 z-45 absolute border-red-400 border-4"> {showToolTip ? <ToolTip handleToolTipDisplaying = {handleToolTipDisplaying}/> : null}</div>
         <div className="z-45 absolute top-9 left-2/4"> {showAddCard ? <AddCard addCard = {handleAddCard} setShowAddCard = {setShowAddCard}/> : null} </div>
-        <div className="absolute z-50">{showSignUp ? <SignUp setShowSignUp= {setShowSignUp} tempName = {generateRandomName()}/> : null}</div>
+        <div className="absolute z-50 right-72 top-20 border-red-400 border-4">{showSignUp ? <SignUp handleSignUp = {handleSignUp} setShowSignUp= {setShowSignUp} tempName = {generateRandomName}/> : null}</div>
         <div className="absolute z-0"> <Scene getCards = {handleGetCards} generateDeck = {generateDeck}/></div>
         </div>
     </>

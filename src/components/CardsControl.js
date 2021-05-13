@@ -9,14 +9,12 @@ import {firestore, auth} from '../firebase';
 import react, {useState, useEffect} from 'react';
 
 function CardsControl() {
-  const [showToolTip, setShowToolTip] = useState(true);
+  const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
-
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([]);
-
   //currentDeck holds a generated deck off of cardArray
   const [currentDeck, setCurrentDeck] = useState([]);
   
@@ -39,9 +37,15 @@ function CardsControl() {
 
   //Handles GET card data from firestore
   const handleGetCards = async () => {
-    const data = await firestore.collection("cards").get();
-    console.log(data);
-      setCardArray(data.docs.map(doc => {return {...doc.data(), id: doc.id} }));
+    try {
+    await firestore.collection("cards").get().then((entry) => {
+      entry.forEach( doc => {
+        setCardArray(cardArray.push({id : doc.id, data : doc.data()}))
+      })
+    });
+    } catch (err) {
+          console.log(err)
+      }
   }
 
 //Runs after handleGetCards in order to generate a deck off the cards db (CB note: have to sync up with localstorage)
@@ -51,6 +55,7 @@ function CardsControl() {
     let randomNumber = Math.floor(Math.random()*(cardArray.length));
     setCurrentDeck(currentDeck.push(cardArray[randomNumber]));
     cardArray.splice(randomNumber, 1);
+    console.log(cardArray)
   }
 } catch (error) {
   console.log(error);

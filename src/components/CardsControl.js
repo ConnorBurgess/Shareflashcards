@@ -13,10 +13,10 @@ function CardsControl() {
   const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [currentDeck, setCurrentDeck] = useState([]);
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([]);
   //currentDeck holds a generated deck off of cardArray
-  const [currentDeck, setCurrentDeck] = useState([]);
   
   //Handles adding a new card to firestore
   const handleAddCard = event => {
@@ -53,14 +53,14 @@ function CardsControl() {
     try{
     for(let i = 0; i < 5; i++) {
     let randomNumber = Math.floor(Math.random()*(cardArray.length));
+    // tempDeck.push(cardArray[randomNumber]);
     setCurrentDeck(currentDeck.push(cardArray[randomNumber]));
     cardArray.splice(randomNumber, 1);
-    console.log(cardArray)
   }
+  return currentDeck;
 } catch (error) {
   console.log(error);
 }
-  console.log(currentDeck);
   }
 
 //Generates a random username in SignUp component
@@ -80,7 +80,7 @@ function CardsControl() {
         <div className="left-52 z-45 md:absolute border-red-400 border-4"> {showToolTip ? <ToolTip setShowToolTip = {setShowToolTip}/> : null}</div>
         <div className="z-50 md:absolute md:top-9 md:left-2/4"> {showAddCard ? <AddCard addCard = {handleAddCard} setShowAddCard = {setShowAddCard}/> : null} </div>
         <div className="absolute z-50 right-72 top-20 border-red-400 border-4">{showSignUp ? <SignUp handleSignUp = {handleSignUp} setShowSignUp= {setShowSignUp} tempName = {generateRandomName}/> : null}</div>
-        <div className="md:absolute z-0"> <Scene currentDeck={currentDeck} getCards = {handleGetCards} generateDeck = {generateDeck}/></div>
+        <div className="md:absolute z-0"> <Scene currentDeck = {currentDeck} setCurrentDeck = {setCurrentDeck} getCards = {handleGetCards} generateDeck = {generateDeck}/></div>
         </div>
     </>
   );

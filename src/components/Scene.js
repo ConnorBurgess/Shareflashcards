@@ -25,6 +25,7 @@ const floatingCardStyle = {
 
 //Matter.js scene
 function Scene(props) {
+
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
   //Handle key events
@@ -80,7 +81,7 @@ function Scene(props) {
     }
     //Add listeners to create div on mouse movement
     const scene = document.querySelector('#scene')
-    scene.addEventListener('mousemove', onMouseMove)
+    // scene.addEventListener('mousemove', onMouseMove)
 
     //   gsap.set('#floating-card', {
     //     xPercent: -50,
@@ -116,7 +117,7 @@ function Scene(props) {
 
     //Add platform
     Composite.add(engine.world, [
-      Bodies.rectangle(800, 550, 200, 30, { isStatic: false, render: { fillStyle: 'white', strokeStyle: 'red' }, id: 1 }),
+      Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: 'white', strokeStyle: 'red' }, id: 1 }),
 
     ]);
 
@@ -136,16 +137,14 @@ function Scene(props) {
 
     Matter.Events.on(mouseConstraint, "mousedown", (event) =>
      {
-      // Composite.add(engine.world, [Bodies.rectangle(Math.random() * 1000 + 1, 0, 100, 50, {
-      //   isStatic: false,
-      //   render: {
-      //     fillStyle: 'blue',
-      //     strokeStyle: 'red',
-      //     lineWidth: 8,
-      //   },
-      //   id: 55
-      // })]);
-      //Testing
+       let getClickedBody = Matter.Query.point(engine.world.bodies, event.mouse.position);
+      if (getClickedBody.length > 0) {
+        console.log(getClickedBody);
+        Matter.Events.on(mouseConstraint, "mouseup", (event) => { console.log("test"); scene.removeEventListener('mousemove', onMouseMove);});
+        console.log(getClickedBody[0].id)
+        scene.addEventListener('mousemove', onMouseMove)
+
+      }
       if (props.currentDeck.length > 0) {
         console.log(props.currentDeck);
         Composite.add(engine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
@@ -162,7 +161,7 @@ function Scene(props) {
         })]);
         props.currentDeck.pop();
       }
-      scene.removeEventListener('mousemove', onMouseMove)
+      
 
     });
 
@@ -184,7 +183,7 @@ function Scene(props) {
   }, [])
 
   return (
-    <div id="scene" className="container flex justify-start border-4 border-red-800">
+    <div id="scene" className="container flex justify-start  ">
       <div id="floating-card" style={floatingCardStyle}>
         <h1 className="text-center">Test flashcard</h1>
         <h1 className="text-center">Ruthless Butterscotch</h1>
@@ -202,7 +201,7 @@ function Scene(props) {
         }}
       >
       </div>
-      <div id="canvas" className="border-blue-800">
+      <div id="canvas" >
         <canvas
           ref={canvasRef} />
       </div>

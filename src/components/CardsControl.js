@@ -12,7 +12,7 @@ function CardsControl() {
   //Handle display of different components
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(true);
   const [showSignIn, setShowSignIn] = useState(false);
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([{}]);
@@ -29,6 +29,7 @@ function CardsControl() {
       <p classname="">{showCard ? "Click to view " : null}</p>
     </div>
   </>);
+
   const [showFollowingCard, setFollowingCard] = useState(false);
 
   const handleShowingLargeCardFront = (id) => {
@@ -39,12 +40,13 @@ function CardsControl() {
     console.log(cardArray.find(e => e.id === id));
     setLargeCardData(
       <>
-        <h1 className="text-center text-">{clickedCard.data.title}</h1>
+        <h1 className="text-center text-red-500">{clickedCard.data.title}</h1>
         <h1 className="text-center">by Ruthless Butterscotch</h1>
         <br />
         <div className="ml-4 mr-4 text-sm">
-          <p>{clickedCard.data.front}</p>
-          <p classname="">{showCard ? "Click to view " : null}</p>
+          <p>{clickedCard.data.front}</p><div>
+          <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
+          </div>
         </div>
       </>)
   }

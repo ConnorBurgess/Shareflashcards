@@ -12,12 +12,14 @@ import PropTypes from "prop-types";
 //Holds style for pop up div when hovering over a Matter.js card
 const floatingCardStyle = {
   position: "absolute",
-  width: "30vh",
-  height: "20vh",
+  width: "18vh",
+  bottom: "500px",
+  overflow: "hidden",
+  height: "26vh",
   top: "0",
   left: "0",
   background: "white",
-  borderRadius: "5%",
+  borderRadius: "3%",
   backfaceVisibility: "hidden",
   pointerEvents: "none",
   opacity: "0.9",
@@ -61,25 +63,36 @@ function Scene(props) {
     setEngine(engine);
     //Set world gravity
     engine.world.gravity.y = 0.1;
-
+    // engine.timing.timeScale = 3.4
     //Render composite
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
       canvas: canvasRef.current,
       options: {
-        showAngleIndicator: true,
+        showAngleIndicator: false,
         width: window.innerWidth,
         height: window.innerHeight,
         showIds: true,
-        background: "rgb(75,85,99)",
+        background: "#4496d0",
         wireframes: false,
       },
     })
 
     //Add platform
     Composite.add(engine.world, [
-      Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: 'white', strokeStyle: 'red' }, id: 1 }),
+      Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46', lineWidth: 3, strokeStyle: 'green ' }, id: "" }),
+      Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
+      Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
+      Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
+      Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
+
+      Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
+      Bodies.rectangle(500, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+
     ]);
 
     // Implement mouse control
@@ -101,14 +114,18 @@ function Scene(props) {
     //Track user clicks
     Matter.Events.on(mouseConstraint, "mousedown", (event) => {
       setUserClicks(prevState => prevState + 1)
+      engine.world.gravity.y = -0.11;
+
     });
     //Implement collision
     Events.on(engine, "collisionStart", function (event) {
       // Composite.removeBody(engine.world, event.source.pairs.list[0].bodyA);
       console.log(event);
-      if (event.source.pairs.collisionActive[0] != undefined) {
-        event.source.pairs.collisionActive[0].bodyA.isSleeping = true;
-      }
+      // if (event.source.pairs.collisionActive[0] != undefined) {
+      //   event.source.pairs.collisionActive[0].bodyA.isSleeping = true;
+      //   // event.source.pairs.collisionActive[0].bodyB.isSleeping = true;
+
+      // }
       console.log(event.source.pairs)
 
       // console.log(event.source.pairs.list[0].bodyA)
@@ -130,13 +147,15 @@ function Scene(props) {
         y: event.offsetY - 200,
         ease: "power4.out",
       })
+      // tl.delay(3);
+      tl.set("#floating-card", { x: 1002, y: 50, fontSize: '10%' });
     }
   }
   useEffect(() => {
     console.log(props.cardArray);
     if (props.currentDeck.length > 1) {
       console.log(props.currentDeck);
-      Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
+      Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 200, 100, {
         isStatic: false,
         render: {
           fillStyle: 'blue',
@@ -191,11 +210,13 @@ function Scene(props) {
     console.log(props.cardArray)
   }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck, props.showFollowingCard]);
   return (
-    <div id="scene" className="container flex justify-start  ">
-      <div id="floating-card" style={floatingCardStyle}>
+    <div id="scene" className="container flex justify-start">
+      {props.showFollowingCard == false ? <div id="floating-card" className="z-50" style={floatingCardStyle}>
         <div>{props.largeCardData}</div>
-
+        <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
       </div>
+        : null}
+
       <div
         ref={boxRef}
         style={{

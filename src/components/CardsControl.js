@@ -12,7 +12,7 @@ function CardsControl() {
   //Handle display of different components
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(true);
+  const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([{}]);
@@ -30,6 +30,7 @@ function CardsControl() {
     </div>
   </>);
 
+  //Card currently following pointer
   const [showFollowingCard, setFollowingCard] = useState(false);
 
   const handleShowingLargeCardFront = (id) => {
@@ -45,7 +46,7 @@ function CardsControl() {
         <br />
         <div className="ml-4 mr-4 text-sm">
           <p>{clickedCard.data.front}</p><div>
-          <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
+            <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
           </div>
         </div>
       </>)
@@ -135,7 +136,7 @@ function CardsControl() {
     }
     fetchData();
   }, []);
- 
+
   useEffect(() => {
     console.log("re-renderedx2")
 

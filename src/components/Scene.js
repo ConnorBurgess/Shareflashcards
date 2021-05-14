@@ -32,6 +32,7 @@ function Scene(props) {
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [userClicks, setUserClicks] = useState(1);
+  const [mGravity, setGravity] = useState(true);
 
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
@@ -81,17 +82,31 @@ function Scene(props) {
 
     //Add platform
     Composite.add(engine.world, [
-      Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46', lineWidth: 3, strokeStyle: 'green ' }, id: "" }),
-      Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
-      Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
-      Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
-      Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46', strokeStyle: 'red', strokeStyle: 'green ' }, id: "" }),
+      //Green platform
+      // Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46'}, id: "" }),
+      // Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
+      // Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
+      // Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
+      // Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
+
+      // Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
+      // Bodies.rectangle(500, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46' }, id: "" }),
+      Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
 
       Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
       Bodies.rectangle(500, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
       Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
       Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
       Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+
+
 
     ]);
 
@@ -114,8 +129,6 @@ function Scene(props) {
     //Track user clicks
     Matter.Events.on(mouseConstraint, "mousedown", (event) => {
       setUserClicks(prevState => prevState + 1)
-      engine.world.gravity.y = -0.11;
-
     });
     //Implement collision
     Events.on(engine, "collisionStart", function (event) {
@@ -147,15 +160,24 @@ function Scene(props) {
         y: event.offsetY - 200,
         ease: "power4.out",
       })
-      // tl.delay(3);
-      tl.set("#floating-card", { x: 1002, y: 50, fontSize: '10%' });
-    }
+     }
   }
+
+  //Check if user presses gravity button
+  useEffect(() => {
+    if (mGravity && mEngine != null) {
+      mEngine.world.gravity.y = 0.1;
+    }
+    else if (mEngine != null) {
+      mEngine.world.gravity.y = -0.11;
+    }
+
+  }, [mGravity, mEngine])
   useEffect(() => {
     console.log(props.cardArray);
     if (props.currentDeck.length > 1) {
       console.log(props.currentDeck);
-      Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 200, 100, {
+      Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
         isStatic: false,
         render: {
           fillStyle: 'blue',
@@ -200,6 +222,9 @@ function Scene(props) {
               // ease: "power4.out",
               ease: "bounce.out"
             })
+                 // tl.delay(3);
+             tl.set("#floating-card", { fontSize: '10%' });
+
             //Remove floating card event listener
             document.querySelector('#scene').removeEventListener('mousemove', onMouseMove);
           });
@@ -211,12 +236,14 @@ function Scene(props) {
   }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck, props.showFollowingCard]);
   return (
     <div id="scene" className="container flex justify-start">
-      {props.showFollowingCard == false ? <div id="floating-card" className="z-50" style={floatingCardStyle}>
+      {props.showFollowingCard == true ? <div id="floating-card" className="z-50" style={floatingCardStyle}>
         <div>{props.largeCardData}</div>
         <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
       </div>
         : null}
-
+      <div>
+        <button className="absolute md:left-1/3 sm:left-1/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-50" onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
+      </div>
       <div
         ref={boxRef}
         style={{

@@ -29,9 +29,11 @@ function CardsControl() {
       <p classname="">{showCard ? "Click to view " : null}</p>
     </div>
   </>);
+  const [showFollowingCard, setFollowingCard] = useState(false);
 
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
+    console.log(id);
     const clickedCard = cardArray.find(e => e.id === id);
     console.log(clickedCard);
     console.log(cardArray.find(e => e.id === id));
@@ -166,6 +168,8 @@ function CardsControl() {
         <div className="md:absolute z-0 ">
           <Scene
             handleShowingLargeCardFront={handleShowingLargeCardFront}
+            showFollowingCard={showFollowingCard}
+            setFollowingCard={setFollowingCard}
             showCard={showCard}
             cardArray={cardArray}
             setShowCard={setShowCard}

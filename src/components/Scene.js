@@ -22,26 +22,14 @@ const floatingCardStyle = {
   pointerEvents: "none",
   opacity: "0.9",
 }
-//gsap animation for div that follows mouse
-function onMouseMove(event) {
-  var tl = gsap.timeline()
-  tl.to(follower, {
-    opacity: 1.0,
-    duration: 0.9,
-    scale: 1.0,
-    x: event.offsetX + 50,
-    y: event.offsetY - 200,
-    ease: "power4.out",
-  })
-}
 
-const follower = document.querySelector('#floating-card')
-const scene = document.querySelector('#scene')
+
 //Matter.js scene
 
 function Scene(props) {
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
+  const [userClicks, setUserClicks] = useState(1);
 
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
@@ -105,10 +93,15 @@ function Scene(props) {
           }
         }
       });
-      //Add ability to drag to engine.world
-      Composite.add(engine.world, mouseConstraint);
-      setMouseConstraint(mouseConstraint);
 
+    //Add ability to drag to engine.world
+    Composite.add(engine.world, mouseConstraint);
+    setMouseConstraint(mouseConstraint);
+
+    //Track user clicks
+    Matter.Events.on(mouseConstraint, "mousedown", (event) => {
+      setUserClicks(prevState => prevState + 1)
+    });
     //Implement collision
     Events.on(engine, "collisionStart", function (event) {
       // Composite.removeBody(engine.world, event.source.pairs.list[0].bodyA);
@@ -122,14 +115,26 @@ function Scene(props) {
     });
     Runner.run(engine);
     Render.run(render);
+
   }, [])
 
+  //gsap animation for div that follows mouse
+  function onMouseMove(event) {
+    if (props.showFollowingCard) {
+      var tl = gsap.timeline()
+      tl.to(document.querySelector('#floating-card'), {
+        opacity: 1.0,
+        duration: 0.9,
+        scale: 1.0,
+        x: event.offsetX + 50,
+        y: event.offsetY - 200,
+        ease: "power4.out",
+      })
+    }
+  }
   useEffect(() => {
-    console.log("second)")
-    console.log(mMouseConstraint);
-    console.log(mEngine);
     console.log(props.cardArray);
-    if (props.currentDeck.length > 0) {
+    if (props.currentDeck.length > 1) {
       console.log(props.currentDeck);
       Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
         isStatic: false,
@@ -146,41 +151,45 @@ function Scene(props) {
 
       props.currentDeck.pop();
     }
+
     //Add mouse events 
-    if (mMouseConstraint != null && mEngine != null) {
-    Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
-      let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
-      if (getClickedBody.length != 0) {
-        let matterCardId = getClickedBody[0].id
-        //Call function to update floating card with card data
-        props.handleShowingLargeCardFront(matterCardId)
+    if (mMouseConstraint != null && mEngine != null && props.cardArray != undefined) {
+      Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
+        let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
 
-        //Add listener to make floating card follow mouse if there is a matter body
-        scene.addEventListener('mousemove', onMouseMove)
+        if (getClickedBody.length != 0 && props.cardArray.length > 1) {
+          props.setFollowingCard(true);
+          let matterCardId = getClickedBody[0].id
+          console.log(matterCardId)
+          console.log(props.cardArray);
+          //Call function to update floating card with card data
+          props.handleShowingLargeCardFront(matterCardId)
+          // //Add listener to make floating card follow mouse if there is a matter body
+          document.querySelector('#scene').addEventListener('mousemove', onMouseMove)
 
-        //Add mouse event to make card enlarge
-        Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
-          //Set large card showing
-          props.setShowCard(true);
-          let tl = gsap.timeline()
-          tl.to(follower, {
-            opacity: 1.0,
-            duration: 2.3,
-            scale: 3.5,
-            x: 500,
-            y: 200,
-            // ease: "power4.out",
-            ease: "bounce.out"
-          })
-          //Remove floating card event listener
-          scene.removeEventListener('mousemove', onMouseMove);
-        });
-      }
-    });
-  }
+          //Add mouse event to make card enlarge
+          Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
+            //Set large card showing
+            props.setShowCard(true);
+            let tl = gsap.timeline()
+            tl.to(document.querySelector('#floating-card'), {
+              opacity: 1.0,
+              duration: 2.3,
+              scale: 3.5,
+              x: 500,
+              y: 200,
+              // ease: "power4.out",
+              ease: "bounce.out"
+            })
+            //Remove floating card event listener
+            document.querySelector('#scene').removeEventListener('mousemove', onMouseMove);
+          });
+        }
+      });
+    }
     console.log(props.currentDeck);
     console.log(props.cardArray)
-  }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck]);
+  }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck, props.showFollowingCard]);
   return (
     <div id="scene" className="container flex justify-start  ">
       <div id="floating-card" style={floatingCardStyle}>

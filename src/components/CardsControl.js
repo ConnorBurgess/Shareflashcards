@@ -33,6 +33,9 @@ function CardsControl() {
   //Card currently following pointer
   const [showFollowingCard, setFollowingCard] = useState(false);
 
+  //WIP while building app to generate more cards
+  const [generateMoreCards, setGenerateMoreCards] = useState(0);
+
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
     console.log(id);
@@ -40,7 +43,7 @@ function CardsControl() {
     console.log(clickedCard);
     console.log(cardArray.find(e => e.id === id));
     setLargeCardData(
-      <>
+      <><div className="bg-red-400">
         <h1 className="text-center text-red-500">{clickedCard.data.title}</h1>
         <h1 className="text-center">by Ruthless Butterscotch</h1>
         <br />
@@ -48,6 +51,7 @@ function CardsControl() {
           <p>{clickedCard.data.front}</p><div>
             <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
           </div>
+        </div>
         </div>
       </>)
   }
@@ -70,7 +74,7 @@ function CardsControl() {
   }
 
   //Handles GET card data from firestore
-  const handleGetCards = async () => {
+  const handleGetCards = async () => {  
     try {
       const cardCollection = await firestore.collection("cards").get().then((entry) => {
         return (entry.docs.map(x => ({
@@ -86,14 +90,16 @@ function CardsControl() {
   }
 
   //Runs after handleGetCards in order to generate a deck off the cards db (have to sync up with localstorage)
-  //note: later fix to not mutate array, instead map/randomize and return new array
+  
   const generateDeck = (cardArrayPassed) => {
     try {
-      let tempDeck = [];
-      for (let i = 0; i < 5; i++) {
-        let randomNumber = Math.floor(Math.floor(Math.random() * cardArrayPassed.length));
-        tempDeck.push(cardArrayPassed[randomNumber]);
-      }
+      const tempDeck = cardArrayPassed.map(x => {return x});
+      // for (let i = 0; i < 7; i++) {"
+      //   let randomNumber = Math.floor(Math.random() * cardArrayPassed.length);
+      //   console.log(cardArrayPassed[randomNumber])
+      //   tempDeck.push(cardArrayPassed[randomNumber]);"
+        console.log(tempDeck);
+      // }
 
       return tempDeck;
     } catch (error) {
@@ -139,11 +145,19 @@ function CardsControl() {
 
   useEffect(() => {
     console.log("re-renderedx2")
-
-    // setCardArray(cardArray.sort(() => Math.random() - 0.5))
+    setCardArray(cardArray.sort(() => Math.random() - 0.5))
+    if(cardArray.length > 7) {
     const trimmedCollection = generateDeck(cardArray);
+    console.log(trimmedCollection);
     setCurrentDeck(trimmedCollection);
-  }, [cardArray])
+    setTimeout(
+      () => {console.log("timeout fired")
+      setGenerateMoreCards()}, 
+      6000
+    );
+    
+  }
+  }, [cardArray, generateMoreCards])
 
   return (
     <>
@@ -181,6 +195,8 @@ function CardsControl() {
             getCards={handleGetCards}
             generateDeck={generateDeck}
             handleKeyPress={handleKeyPress}
+            setGenerateMoreCards ={setGenerateMoreCards}
+            generateMoreCard ={generateMoreCards}
             largeCardData={largeCardData} />
         </div>
       </div>

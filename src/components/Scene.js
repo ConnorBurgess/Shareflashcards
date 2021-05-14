@@ -160,7 +160,7 @@ function Scene(props) {
         y: event.offsetY - 200,
         ease: "power4.out",
       })
-     }
+    }
   }
 
   //Check if user presses gravity button
@@ -173,10 +173,11 @@ function Scene(props) {
     }
 
   }, [mGravity, mEngine])
+
   useEffect(() => {
-    console.log(props.cardArray);
-    if (props.currentDeck.length > 1) {
-      console.log(props.currentDeck);
+    console.log("hello world")
+    console.log(props.currentDeck);
+    for (let i = 0; i < props.currentDeck.length; i++) {
       Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 70, 100, {
         isStatic: false,
         render: {
@@ -189,9 +190,12 @@ function Scene(props) {
         },
         id: props.currentDeck[props.currentDeck.length - 1].id
       })]);
-
       props.currentDeck.pop();
     }
+  }, [props.currentDeck])
+  useEffect(() => {
+    console.log(props.cardArray);
+
 
     //Add mouse events 
     if (mMouseConstraint != null && mEngine != null && props.cardArray != undefined) {
@@ -222,8 +226,8 @@ function Scene(props) {
               // ease: "power4.out",
               ease: "bounce.out"
             })
-                 // tl.delay(3);
-             tl.set("#floating-card", { fontSize: '10%' });
+            // tl.delay(3);
+            tl.set("#floating-card", { fontSize: '10%' });
 
             //Remove floating card event listener
             document.querySelector('#scene').removeEventListener('mousemove', onMouseMove);
@@ -242,7 +246,9 @@ function Scene(props) {
       </div>
         : null}
       <div>
-        <button className="absolute md:left-1/3 sm:left-1/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-50" onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
+        <button className="absolute md:left-1/3 sm:left-1/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
+        <button className="absolute md:left-2/3 sm:left-2/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState+1)}>Generate cards</button>
+
       </div>
       <div
         ref={boxRef}

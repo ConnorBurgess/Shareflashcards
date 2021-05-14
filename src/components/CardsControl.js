@@ -16,25 +16,46 @@ function CardsControl() {
   const [showSignIn, setShowSignIn] = useState(false);
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([{}]);
-
   //currentDeck holds a smaller generated deck off of cardArray
   const [currentDeck, setCurrentDeck] = useState([]);
   const [showCard, setShowCard] = useState(false);
+  //Holds card data which is updated when card is enlarged
+  const [largeCardData, setLargeCardData] = useState(<>
+    <h1 className="text-center text-">Placeholder Flashcard</h1>
+    <h1 className="text-center">by Ruthless Butterscotch</h1>
+    <br />
+    <div className="ml-4 mr-4 text-sm">
+      <p>Why did the chicken cross the road?</p>
+      <p classname="">{showCard ? "Click to view " : null}</p>
+    </div>
+  </>);
 
-  //After card is generated into matter world shownDeck holds that card's data
-  const [shownDeck, setShownDeck] = useState([]);
 
   // Handles setting data from child components
+  // const handleShownDeck = (val) => {
+  //   if (val != null) {
+  //     setShownDeck(prevState => { return [...prevState, val] });
+  //   }
+  //   return shownDeck
+  // }
 
-  const handleShownDeck = (val) => {
-      setShownDeck(prevState => {return [...prevState, val]});
-    console.log(shownDeck);
-    return shownDeck
+  const handleShowingLargeCardFront = (id) => {
+    console.log(cardArray);
+    console.log(cardArray.filter(e => e.id === id));
+    const clickedCard = cardArray.find(e => e.id === id);
+    console.log(cardArray.find(e => e.id === id));
+    setLargeCardData(
+      <>
+        <h1 className="text-center text-">{clickedCard.data.title}</h1>
+        <h1 className="text-center">by Ruthless Butterscotch</h1>
+        <br />
+        <div className="ml-4 mr-4 text-sm">
+          <p>{clickedCard.data.front}</p>
+          <p classname="">{showCard ? "Click to view " : null}</p>
+        </div>
+      </>)
   }
 
-
-
-  console.log(shownDeck);
   //Handles adding a new card to firestore
   const handleAddCard = event => {
     event.preventDefault();
@@ -55,23 +76,28 @@ function CardsControl() {
   //Handles GET card data from firestore
   const handleGetCards = async () => {
     try {
-      await firestore.collection("cards").get().then((entry) => {
-        entry.forEach(doc => {
-          setCardArray(cardArray.push({ id: doc.id, data: doc.data() }))
-        })
+      const cardCollection = await firestore.collection("cards").get().then((entry) => {
+        return (entry.docs.map(x => ({
+          id: x.id,
+          data: x.data()
+        }))
+        )
       });
+      return cardCollection
     } catch (err) {
       console.log(err)
     }
   }
 
-  //Runs after handleGetCards in order to generate a deck off the cards db (CB note: have to sync up with localstorage)
-  const generateDeck = async () => {
+  //Runs after handleGetCards in order to generate a deck off the cards db (have to sync up with localstorage)
+  //note: later fix to not mutate array, instead map/randomize and return new azrray
+  const generateDeck = async (currentDeck) => {
     try {
       for (let i = 0; i < 5; i++) {
-        let randomNumber = Math.floor(Math.random() * (cardArray.length));
+        let randomNumber = Math.floor(Math.random() * (cardArray.length - 1));
+        console.log(cardArray);
         setCurrentDeck(currentDeck.push(cardArray[randomNumber]));
-        cardArray.splice(randomNumber, 1);
+        // cardArray.splice(randomNumber, 1);
       }
       return currentDeck;
     } catch (error) {
@@ -79,6 +105,29 @@ function CardsControl() {
     }
   }
 
+  const handleKeyPress = async (event) => {
+    if (event.key === 'z') {
+      await handleGetCards();
+      console.log(cardArray);
+      await generateDeck();
+      console.log(cardArray);
+      console.log(currentDeck);
+      //Freezes all items in world
+      // if (event.key === 'f') {
+      //   this.state.worldBodies.forEach((item) => {
+      //     item.isSleeping = true;
+      //   })
+      // }
+      if (event.key === 'g') {
+        // this.state.worldBodies.forEach((item) => {
+        //   item.isSleeping = false;
+        // })
+      }
+    }
+  }
+  useEffect(() => {
+    console.log(cardArray)
+  }, [cardArray]);
 
   //Generates a random username in SignUp component
   const generateRandomName = () => {
@@ -91,7 +140,10 @@ function CardsControl() {
   }
 
   useEffect(() => {
-  },[]);
+    console.log("re-rendered")
+    console.log(cardArray)
+  }, [cardArray]);
+
   return (
     <>
       <div className="z-50"><NavBar /></div>
@@ -116,15 +168,17 @@ function CardsControl() {
             : null}</div>
 
         <div className="md:absolute z-0 ">
-          <Scene shownDeck={shownDeck}
-            setShownDeck={setShownDeck}
-            handleShownDeck={handleShownDeck}
+          <Scene
+            handleShowingLargeCardFront={handleShowingLargeCardFront}
             showCard={showCard}
+            cardArray={cardArray}
             setShowCard={setShowCard}
             currentDeck={currentDeck}
             setCurrentDeck={setCurrentDeck}
             getCards={handleGetCards}
-            generateDeck={generateDeck} />
+            generateDeck={generateDeck}
+            handleKeyPress={handleKeyPress}
+            largeCardData={largeCardData} />
         </div>
       </div>
     </>

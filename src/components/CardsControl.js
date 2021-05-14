@@ -30,19 +30,10 @@ function CardsControl() {
     </div>
   </>);
 
-
-  // Handles setting data from child components
-  // const handleShownDeck = (val) => {
-  //   if (val != null) {
-  //     setShownDeck(prevState => { return [...prevState, val] });
-  //   }
-  //   return shownDeck
-  // }
-
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
-    console.log(cardArray.filter(e => e.id === id));
     const clickedCard = cardArray.find(e => e.id === id);
+    console.log(clickedCard);
     console.log(cardArray.find(e => e.id === id));
     setLargeCardData(
       <>
@@ -90,28 +81,23 @@ function CardsControl() {
   }
 
   //Runs after handleGetCards in order to generate a deck off the cards db (have to sync up with localstorage)
-  //note: later fix to not mutate array, instead map/randomize and return new azrray
-  const generateDeck = async (currentDeck) => {
+  //note: later fix to not mutate array, instead map/randomize and return new array
+  const generateDeck = (cardArrayPassed) => {
     try {
+      let tempDeck = [];
       for (let i = 0; i < 5; i++) {
-        let randomNumber = Math.floor(Math.random() * (cardArray.length - 1));
-        console.log(cardArray);
-        setCurrentDeck(currentDeck.push(cardArray[randomNumber]));
-        // cardArray.splice(randomNumber, 1);
+        let randomNumber = Math.floor(Math.floor(Math.random() * cardArrayPassed.length));
+        tempDeck.push(cardArrayPassed[randomNumber]);
       }
-      return currentDeck;
+
+      return tempDeck;
     } catch (error) {
       console.log(error);
     }
   }
 
-  const handleKeyPress = async (event) => {
+  const handleKeyPress = (event) => {
     if (event.key === 'z') {
-      await handleGetCards();
-      console.log(cardArray);
-      await generateDeck();
-      console.log(cardArray);
-      console.log(currentDeck);
       //Freezes all items in world
       // if (event.key === 'f') {
       //   this.state.worldBodies.forEach((item) => {
@@ -125,9 +111,6 @@ function CardsControl() {
       }
     }
   }
-  useEffect(() => {
-    console.log(cardArray)
-  }, [cardArray]);
 
   //Generates a random username in SignUp component
   const generateRandomName = () => {
@@ -139,10 +122,23 @@ function CardsControl() {
     return name;
   }
 
+  //Call functions to fetch firestore data upon component mount
   useEffect(() => {
     console.log("re-rendered")
-    console.log(cardArray)
-  }, [cardArray]);
+    const fetchData = async () => {
+      const cardCollection = await handleGetCards();
+      setCardArray(cardCollection);
+    }
+    fetchData();
+  }, []);
+ 
+  useEffect(() => {
+    console.log("re-renderedx2")
+
+    // setCardArray(cardArray.sort(() => Math.random() - 0.5))
+    const trimmedCollection = generateDeck(cardArray);
+    setCurrentDeck(trimmedCollection);
+  }, [cardArray])
 
   return (
     <>

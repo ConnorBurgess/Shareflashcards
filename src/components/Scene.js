@@ -34,6 +34,7 @@ function Scene(props) {
       await props.getCards();
       await props.generateDeck();
       console.log(props.currentDeck);
+      console.log(props.shownDeck);
       //Freezes all items in world
       if (event.key === 'f') {
         this.state.worldBodies.forEach((item) => {
@@ -63,16 +64,19 @@ function Scene(props) {
 
     //Add keydown events
     document.addEventListener("keydown", handleKeyPress, false);
-    console.log(this)
+    const follower = document.querySelector('#floating-card')
+    const scene = document.querySelector('#scene')
 
-
+    //gsap animation for div that follows mouse
     function onMouseMove(event) {
-      console.log(this);
-      const follower = this.querySelector('#floating-card')
-      console.log(follower)
 
-      gsap.to(follower, {
+      console.log(this);
+      console.log(follower)
+      var tl = gsap.timeline()
+      tl.to(follower, {
+        opacity: 1.0,
         duration: 0.9,
+        scale: 1.0,
         x: event.offsetX + 50,
         y: event.offsetY - 200,
         ease: "power4.out",
@@ -80,7 +84,6 @@ function Scene(props) {
       })
     }
     //Add listeners to create div on mouse movement
-    const scene = document.querySelector('#scene')
     // scene.addEventListener('mousemove', onMouseMove)
 
     //   gsap.set('#floating-card', {
@@ -90,7 +93,7 @@ function Scene(props) {
 
     let engine = Engine.create({});
     //Set world gravity
-    engine.world.gravity.y = 0.01;
+    engine.world.gravity.y = 0.1;
 
     //Render composite
     let render = Render.create({
@@ -98,6 +101,7 @@ function Scene(props) {
       engine: engine,
       canvas: canvasRef.current,
       options: {
+        showAngleIndicator: true,
         width: window.innerWidth,
         height: window.innerHeight,
         showIds: true,
@@ -118,7 +122,6 @@ function Scene(props) {
     //Add platform
     Composite.add(engine.world, [
       Bodies.rectangle(800, 550, 200, 30, { isStatic: true, render: { fillStyle: 'white', strokeStyle: 'red' }, id: 1 }),
-
     ]);
 
     // Implement mouse control
@@ -135,15 +138,26 @@ function Scene(props) {
     //Add ability to drag to engine.world
     Composite.add(engine.world, mouseConstraint);
 
-    Matter.Events.on(mouseConstraint, "mousedown", (event) =>
-     {
-       let getClickedBody = Matter.Query.point(engine.world.bodies, event.mouse.position);
+    Matter.Events.on(mouseConstraint, "mousedown", (event) => {
+      let getClickedBody = Matter.Query.point(engine.world.bodies, event.mouse.position);
       if (getClickedBody.length > 0) {
         console.log(getClickedBody);
-        Matter.Events.on(mouseConstraint, "mouseup", (event) => { console.log("test"); scene.removeEventListener('mousemove', onMouseMove);});
         console.log(getClickedBody[0].id)
         scene.addEventListener('mousemove', onMouseMove)
-
+        Matter.Events.on(mouseConstraint, "mouseup", (event) => {
+          props.setShowCard(true);
+          let tl = gsap.timeline()
+          tl.to(follower, {
+            opacity: 1.0,
+            duration: 2.3,
+            scale: 3.5,
+            x: 500,
+            y: 200,
+            // ease: "power4.out",
+            ease: "bounce.out"
+          })
+          scene.removeEventListener('mousemove', onMouseMove);
+        });
       }
       if (props.currentDeck.length > 0) {
         console.log(props.currentDeck);
@@ -157,11 +171,16 @@ function Scene(props) {
               texture: testCard
             }
           },
-          id: 5
+          id: props.currentDeck[props.currentDeck.length-1].id
         })]);
+        //Add generated card to shownDeck array and pop off of currentDeck
+        console.log(props.currentDeck[props.currentDeck.length-1])
+        props.handleShownDeck(props.currentDeck[props.currentDeck.length-1])
+        console.log(...props.currentDeck)
         props.currentDeck.pop();
+        console.log(props.shownDeck);
       }
-      
+
 
     });
 
@@ -177,7 +196,6 @@ function Scene(props) {
 
       // console.log(event.source.pairs.list[0].bodyA)
     });
-    //Componentdidmount ended here
     Runner.run(engine);
     Render.run(render);
   }, [])
@@ -185,11 +203,12 @@ function Scene(props) {
   return (
     <div id="scene" className="container flex justify-start  ">
       <div id="floating-card" style={floatingCardStyle}>
-        <h1 className="text-center">Test flashcard</h1>
-        <h1 className="text-center">Ruthless Butterscotch</h1>
+        <h1 className="text-center text-">Test flashcard</h1>
+        <h1 className="text-center">by Ruthless Butterscotch</h1>
         <br />
-        <div className="ml-4 mr-4">
+        <div className="ml-4 mr-4 text-sm">
           <p> Why didn't the chicken cross the road?</p>
+          <p>{props.showCard ? "hello" : null}</p>
         </div>
 
       </div>

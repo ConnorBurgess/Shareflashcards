@@ -11,7 +11,7 @@ import react, { useState, useEffect } from 'react';
 function CardsControl() {
   //Handle display of different components
   const [showToolTip, setShowToolTip] = useState(true);
-  const [showAddCard, setShowAddCard] = useState(true);
+  const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
 
@@ -38,7 +38,9 @@ function CardsControl() {
 
 
   //WIP to generate more cards
-  const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(1);
+  const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
+
+  //Boost for more cards
   const [generateMoreCards, setGenerateMoreCards] = useState(1);
 
   const handleShowingLargeCardFront = (id) => {
@@ -55,6 +57,8 @@ function CardsControl() {
         <div className="ml-4 mr-4">
           <p>{clickedCard.data.front}</p><div>
             <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
+            <button className="absolute md:left-2/3 sm:left-2/4 my-3   text-bold transform hover:scale-105 z-0">testtttt cards</button>
+
           </div>
         </div>
         </div>
@@ -154,7 +158,7 @@ function CardsControl() {
     const trimmedCollection = generateDeck(cardArray);
     console.log(trimmedCollection);
     setCurrentDeck(trimmedCollection);
-    let randomTime = Math.floor(Math.random() * (8000 - 2000 + 1)) + 2000
+    let randomTime = Math.floor(Math.random() * (30000 - 7000 + 1)) + 7000
     setTimeout(
       () => 
       setGenerateMoreCards(prevState => prevState + 1), 
@@ -187,14 +191,13 @@ function CardsControl() {
             tempName={generateRandomName} />
             : null}</div>
 
-        <div className="md:absolute z-0 ">
+        <div className=" z-0 ">
           <Scene
             cardArray={cardArray}
             handleShowingLargeCardFront={handleShowingLargeCardFront}
             //Determines whether actual card is visible after clicking or not
             showFollowingCard={showFollowingCard}
             setFollowingCard={setFollowingCard}
-
             showLargeCard={showLargeCard}
             setShowLargeCard={setShowLargeCard}
             currentDeck={currentDeck}
@@ -202,8 +205,10 @@ function CardsControl() {
             getCards={handleGetCards}
             generateDeck={generateDeck}
             handleKeyPress={handleKeyPress}
+            //Press button to generate more cards
             setGenerateMoreCards ={setGenerateMoreCards}
-            generateMoreCard ={generateMoreCards}
+            //Turn card generation on or off
+            setCurrentlyGeneratingCards={setCurrentlyGeneratingCards}
             largeCardData={largeCardData} />
         </div>
       </div>

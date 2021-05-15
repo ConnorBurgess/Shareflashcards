@@ -4,6 +4,7 @@ import Matter from "matter-js";
 import image from '../img/card.svg';
 import testCard from '../img/testcard2.png';
 import background from '../img/background.jpg';
+import testbackground from '../img/testb.png'
 import ToolTip from './ToolTip';
 import { firestore } from '../firebase';
 import { gsap } from "gsap";
@@ -12,10 +13,10 @@ import PropTypes from "prop-types";
 //Holds style for pop up div when hovering over a Matter.js card
 const floatingCardStyle = {
   position: "absolute",
-  width: "18vh",
+  width: "15vh",
   bottom: "500px",
   overflow: "hidden",
-  height: "26vh",
+  height: "20vh",
   top: "0",
   left: "0",
   background: "white",
@@ -25,6 +26,7 @@ const floatingCardStyle = {
   opacity: "0.9",
 }
 
+const STATIC_DENSITY = 15
 
 //Matter.js scene
 
@@ -36,6 +38,17 @@ function Scene(props) {
 
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
+
+  
+  //responsive
+  const [constraints, setContraints] = useState()
+  const [scene, setScene] = useState()
+  const handleResize = () => {
+    console.log("resizing")
+    setContraints(boxRef.current.getBoundingClientRect())
+  }
+
+
   //Handle key events
   // useEffect(() => {
   //   console.log("re-rendered")
@@ -72,9 +85,10 @@ function Scene(props) {
       canvas: canvasRef.current,
       options: {
         showAngleIndicator: false,
+        showIds: true,
         width: window.innerWidth,
         height: window.innerHeight,
-        showIds: true,
+        texture: testbackground,
         background: "#4496d0",
         wireframes: false,
       },
@@ -94,17 +108,17 @@ function Scene(props) {
       // Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
       // Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
       // Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46' }, id: "" }),
-      Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-      Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      // Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46' }, id: "" }),
+      // Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      // Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
       Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-      Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
+      // Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
 
-      Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
-      Bodies.rectangle(500, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
+      Bodies.rectangle(500, 550, 333.50, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      Bodies.rectangle(700, 550, 333.50, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
+      // Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
 
 
 
@@ -146,19 +160,63 @@ function Scene(props) {
     Runner.run(engine);
     Render.run(render);
 
+
+    //Responsive state
+    setContraints(boxRef.current.getBoundingClientRect())
+    setScene(render)
+
+    window.addEventListener('resize', handleResize)
   }, [])
 
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  //Manages responsiveness on adjusting window
+  useEffect(() => {
+    if (constraints) {
+      let { width, height } = constraints
+      console.log(constraints);
+      scene.bounds.max.x = width
+      scene.bounds.max.y = height
+      scene.options.width = width
+      scene.options.height = height
+      scene.canvas.width = width
+      scene.canvas.height = height
+
+    //Reset position of static composite bodies
+      const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
+      console.log(scene.engine.world.bodies)
+      floor.forEach(element => {
+        console.log(element)
+      Matter.Body.setPosition(element, {  
+        x: width/2,
+        y: height - 100,
+      })
+    }
+      )
+    }
+    
+  }, [scene, constraints])
+  
+  
   //gsap animation for div that follows mouse
   function onMouseMove(event) {
     console.log(props.showFollowingCard)
+    console.log(event)
     if (props.showFollowingCard) {
+      console.log("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEST")
       var tl = gsap.timeline()
       tl.to(document.querySelector('#floating-card'), {
         opacity: 1.0,
         duration: 0.9,
         scale: 1.0,
-        x: event.offsetX + 50,
-        y: event.offsetY - 200,
+        //responsive default
+        x: event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 50,
+        y: event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200,
         ease: "power4.out",
       })
     }
@@ -194,13 +252,12 @@ function Scene(props) {
       props.currentDeck.pop();
     }
   }, [props.currentDeck])
+  
   useEffect(() => {
     console.log(props.cardArray);
-
-
     //Add mouse events 
     if (mMouseConstraint != null && mEngine != null && props.cardArray != undefined) {
-      Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
+      Matter.Events.on(mMouseConstraint, "mousedown" || "touchstart", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
 
         if (getClickedBody.length != 0 && props.cardArray.length > 1) {
@@ -211,7 +268,7 @@ function Scene(props) {
           //Call function to update floating card with card data
           props.handleShowingLargeCardFront(matterCardId)
           // //Add listener to make floating card follow mouse if there is a matter body
-          document.querySelector('#scene').addEventListener('mousemove', onMouseMove)
+          document.querySelector('#scene').addEventListener('touchmove', onMouseMove)
 
           //Add mouse event to make card enlarge
           Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
@@ -222,10 +279,13 @@ function Scene(props) {
             tl.to(document.querySelector('#floating-card'), {
               opacity: 1.0,
               duration: 1.7,
-              scale: 3.5,
-              x: 500 + Math.ceil(Math.random() * 200) * (Math.round(Math.random()) ? 1 : -1)
+              scale: 3.0,
+              x: 100 
+              // + Math.ceil(Math.random() * 200) * (Math.round(Math.random()) ? 1 : -1)
               ,
-              y: 200 + Math.ceil(Math.random() * 50) * (Math.round(Math.random()) ? 1 : -1),
+              y: 200 
+              // + Math.ceil(Math.random() * 50) * (Math.round(Math.random()) ? 1 : -1)
+              ,
               // ease: "power4.out",
               ease: "elastic.out"
             })
@@ -243,22 +303,26 @@ function Scene(props) {
     console.log(props.cardArray)
   }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck, props.showFollowingCard]);
   return (
-    <div id="scene" className="container flex justify-start">
+    <div id="scene" className="container flex justify-center relative ">
       {props.showFollowingCard == true ? <div id="floating-card" className="z-50" style={floatingCardStyle}>
         <div>{props.largeCardData}</div>
         <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
       </div>
         : null}
-      <div>
-        <button className="absolute md:left-1/3 sm:left-1/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
-        <button className="absolute md:left-2/3 sm:left-2/4 my-3 text-white outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState+1)}>Generate cards</button>
-
+      <div className="absolute flex space m-5">
+        <div className="justify-evenly">
+        <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10 " onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
+        <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState+1)}>Card Boost</button>
+        </div>
+        <div className="justify-end flex">
+          <button className="text-white m-2 justify-end outline-none select-none animate-pulse text-bold transform hover:scale-105 z-10" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+        </div>
       </div>
       <div
         ref={boxRef}
         style={{
-          width: 1200,
-          height: 600,
+          width: "100%",
+          height: "100%",
         }}
       >
       </div>

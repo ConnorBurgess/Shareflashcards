@@ -150,6 +150,7 @@ function Scene(props) {
 
   //gsap animation for div that follows mouse
   function onMouseMove(event) {
+    console.log(props.showFollowingCard)
     if (props.showFollowingCard) {
       var tl = gsap.timeline()
       tl.to(document.querySelector('#floating-card'), {
@@ -215,19 +216,22 @@ function Scene(props) {
           //Add mouse event to make card enlarge
           Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
             //Set large card showing
-            props.setShowCard(true);
+            props.setShowLargeCard(true);
+            console.log(props.showLargeCard);
             let tl = gsap.timeline()
             tl.to(document.querySelector('#floating-card'), {
               opacity: 1.0,
-              duration: 2.3,
+              duration: 1.7,
               scale: 3.5,
-              x: 500,
-              y: 200,
+              x: 500 + Math.ceil(Math.random() * 200) * (Math.round(Math.random()) ? 1 : -1)
+              ,
+              y: 200 + Math.ceil(Math.random() * 50) * (Math.round(Math.random()) ? 1 : -1),
               // ease: "power4.out",
-              ease: "bounce.out"
+              ease: "elastic.out"
             })
             // tl.delay(3);
             tl.set("#floating-card", { fontSize: '10%' });
+            tl.delay(0.3)
 
             //Remove floating card event listener
             document.querySelector('#scene').removeEventListener('mousemove', onMouseMove);

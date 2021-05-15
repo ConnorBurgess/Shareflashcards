@@ -10,15 +10,21 @@ import react, { useState, useEffect } from 'react';
 
 function CardsControl() {
   //Handle display of different components
-  const [showToolTip, setShowToolTip] = useState(false);
-  const [showAddCard, setShowAddCard] = useState(false);
+  const [showToolTip, setShowToolTip] = useState(true);
+  const [showAddCard, setShowAddCard] = useState(true);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
+
   //CardArray holds all of DB card
   const [cardArray, setCardArray] = useState([{}]);
+
   //currentDeck holds a smaller generated deck off of cardArray
   const [currentDeck, setCurrentDeck] = useState([]);
-  const [showCard, setShowCard] = useState(false);
+  const [showLargeCard, setShowLargeCard] = useState(false);
+
+  //Card currently following pointer
+  const [showFollowingCard, setFollowingCard] = useState(false);
+  
   //Holds card data which is updated when card is enlarged
   const [largeCardData, setLargeCardData] = useState(<>
     <h1 className="text-center text-">Placeholder Flashcard</h1>
@@ -26,15 +32,14 @@ function CardsControl() {
     <br />
     <div className="ml-4 mr-4 text-sm">
       <p>Why did the chicken cross the road?</p>
-      <p classname="">{showCard ? "Click to view " : null}</p>
+      <p classname="">{showLargeCard ? "Click to view " : null}</p>
     </div>
   </>);
 
-  //Card currently following pointer
-  const [showFollowingCard, setFollowingCard] = useState(false);
 
-  //WIP while building app to generate more cards
-  const [generateMoreCards, setGenerateMoreCards] = useState(0);
+  //WIP to generate more cards
+  const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(1);
+  const [generateMoreCards, setGenerateMoreCards] = useState(1);
 
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
@@ -47,7 +52,7 @@ function CardsControl() {
         <h1 className="text-center text-red-500">{clickedCard.data.title}</h1>
         <h1 className="text-center">by Ruthless Butterscotch</h1>
         <br />
-        <div className="ml-4 mr-4 text-sm">
+        <div className="ml-4 mr-4">
           <p>{clickedCard.data.front}</p><div>
             <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
           </div>
@@ -93,14 +98,13 @@ function CardsControl() {
   
   const generateDeck = (cardArrayPassed) => {
     try {
-      const tempDeck = cardArrayPassed.map(x => {return x});
+      const tempDeck = cardArrayPassed.map(x => {return x}).sort();
       // for (let i = 0; i < 7; i++) {"
       //   let randomNumber = Math.floor(Math.random() * cardArrayPassed.length);
       //   console.log(cardArrayPassed[randomNumber])
       //   tempDeck.push(cardArrayPassed[randomNumber]);"
         console.log(tempDeck);
       // }
-
       return tempDeck;
     } catch (error) {
       console.log(error);
@@ -150,13 +154,14 @@ function CardsControl() {
     const trimmedCollection = generateDeck(cardArray);
     console.log(trimmedCollection);
     setCurrentDeck(trimmedCollection);
+    let randomTime = Math.floor(Math.random() * (8000 - 2000 + 1)) + 2000
     setTimeout(
-      () => {console.log("timeout fired")
-      setGenerateMoreCards()}, 
-      6000
+      () => 
+      setGenerateMoreCards(prevState => prevState + 1), 
+      randomTime
     );
-    
   }
+  
   }, [cardArray, generateMoreCards])
 
   return (
@@ -168,7 +173,7 @@ function CardsControl() {
         <div className="left-52 z-45 md:absolute border-red-400 border-4">
           {showToolTip ? <ToolTip
             setShowToolTip={setShowToolTip} /> : null}</div>
-        <div className="z-50 md:absolute md:top-9 md:left-2/4">
+        <div className="z-50 md:absolute md:top-9 md:left-1/4 drag">
 
           {showAddCard ? <AddCard
             addCard={handleAddCard}
@@ -184,12 +189,14 @@ function CardsControl() {
 
         <div className="md:absolute z-0 ">
           <Scene
+            cardArray={cardArray}
             handleShowingLargeCardFront={handleShowingLargeCardFront}
+            //Determines whether actual card is visible after clicking or not
             showFollowingCard={showFollowingCard}
             setFollowingCard={setFollowingCard}
-            showCard={showCard}
-            cardArray={cardArray}
-            setShowCard={setShowCard}
+
+            showLargeCard={showLargeCard}
+            setShowLargeCard={setShowLargeCard}
             currentDeck={currentDeck}
             setCurrentDeck={setCurrentDeck}
             getCards={handleGetCards}

@@ -113,7 +113,7 @@ function CardsControl() {
         setShowSignUp(true);
         setShowToolTip(true);
       });
-      setShowSignUp(false);
+    setShowSignUp(false);
     var user = auth.currentUser;
     console.log(user);
 
@@ -171,7 +171,7 @@ function CardsControl() {
   //Generates a random username in SignUp component
   const generateRandomName = () => {
     let firstArr = ["ruthless", "smart", "eager", "envious", "energetic", "joyous", "shiny", "sleepy"]
-    let secondArr = ["buttercotch", "sardine", "iguana", "walrus", "rhinoceros", "kitten", "albatross"]
+    let secondArr = ["butterscotch", "sardine", "iguana", "walrus", "rhinoceros", "kitten", "albatross"]
     let randomNumber = Math.floor(Math.random() * (firstArr.length));
     let randomNumber2 = Math.floor(Math.random() * (secondArr.length));
     let name = firstArr[randomNumber] + "_" + secondArr[randomNumber2];
@@ -229,10 +229,10 @@ function CardsControl() {
   return (
     <>
       <div ref={appBox}>
-        <div className="z-50"><NavBar /></div>
+        {/* <div className="z-50"><NavBar /></div> */}
         {/* <div ref={draggableSignIn} className="absolute z-50"><SignIn/></div> */}
         <div className="">
-          <div ref={draggableToolTip} className="z-50 left-52 md:absolute border-red-400 border-4">
+          <div ref={draggableToolTip} className="z-50 left-52 md:absolute">
             {showToolTip ? <ToolTip
               setShowToolTip={setShowToolTip} /> : null}</div>
 
@@ -242,10 +242,10 @@ function CardsControl() {
               setShowAddCard={setShowAddCard} />
               : null} </div>
 
-          <div ref={draggableSignUp} className="absolute z-30 right-72 top-20 border-red-400 border-4 w-3/4">
+          <div ref={draggableSignUp} className="absolute m-20 z-30 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
             {/*setShowSignUp can be removed later*/}
             {/* {auth.currentUser != null ? setShowSignUp(true) : null  } */
-            console.log(auth.currentUser)}
+              console.log(auth.currentUser)}
             {showSignUp ? <SignUp
               handleSignUp={handleSignUp}
               setShowSignUp={setShowSignUp}

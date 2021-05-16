@@ -5,14 +5,19 @@ import ToolTip from './ToolTip';
 import AddCard from './AddCard';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
-import { firestore, auth } from '../firebase';
-import react, { useState, useEffect } from 'react';
+import firebase, { firestore, auth } from '../firebase';
+import react, { useState, useEffect, useRef } from 'react';
+import { gsap } from "gsap";
+import { Draggable } from "gsap/Draggable";
+gsap.registerPlugin(Draggable);
+
+
 
 function CardsControl() {
   //Handle display of different components
-  const [showToolTip, setShowToolTip] = useState(true);
+  const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(true);
   const [showSignIn, setShowSignIn] = useState(false);
 
   //CardArray holds all of DB card
@@ -24,7 +29,7 @@ function CardsControl() {
 
   //Card currently following pointer
   const [showFollowingCard, setFollowingCard] = useState(false);
-  
+
   //Holds card data which is updated when card is enlarged
   const [largeCardData, setLargeCardData] = useState(<>
     <h1 className="text-center text-">Placeholder Flashcard</h1>
@@ -36,12 +41,25 @@ function CardsControl() {
     </div>
   </>);
 
-
   //WIP to generate more cards
   const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
 
   //Boost for more cards
   const [generateMoreCards, setGenerateMoreCards] = useState(1);
+
+  //Generates a new username when user clicks button
+  const [userName, setUserName] = useState(null);
+
+
+  //Draggable element refs
+  //put refs in an array later
+  const draggableRefs = useRef([])
+  const draggableToolTip = useRef(null);
+  const draggableSignIn = useRef(null);
+  const draggableSignUp = useRef(null);
+  const draggableAddCard = useRef(null);
+
+  const appBox = useRef(null);
 
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
@@ -61,7 +79,7 @@ function CardsControl() {
 
           </div>
         </div>
-        </div>
+      </div>
       </>)
   }
 
@@ -77,13 +95,32 @@ function CardsControl() {
       })
   }
 
-  //Handles signing up 
-  const handleSignUp = userInfo => {
-    console.log("test")
+  //Handles signing up
+  const handleSignUp = newUser => {
+    newUser.preventDefault();
+
+    firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
+    var user = firebase.auth().currentUser;
+    user.updateProfile({
+      displayName: newUser.target.userName.value
+    })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+        //Popup tooltip with error and reload signup module if error occurs
+        setShowSignUp(true);
+        setShowToolTip(true);
+      });
+      setShowSignUp(false);
+    var user = auth.currentUser;
+    console.log(user);
+
   }
 
   //Handles GET card data from firestore
-  const handleGetCards = async () => {  
+  const handleGetCards = async () => {
     try {
       const cardCollection = await firestore.collection("cards").get().then((entry) => {
         return (entry.docs.map(x => ({
@@ -99,15 +136,15 @@ function CardsControl() {
   }
 
   //Runs after handleGetCards in order to generate a deck off the cards db (have to sync up with localstorage)
-  
+
   const generateDeck = (cardArrayPassed) => {
     try {
-      const tempDeck = cardArrayPassed.map(x => {return x}).sort();
+      const tempDeck = cardArrayPassed.map(x => { return x }).sort();
       // for (let i = 0; i < 7; i++) {"
       //   let randomNumber = Math.floor(Math.random() * cardArrayPassed.length);
       //   console.log(cardArrayPassed[randomNumber])
       //   tempDeck.push(cardArrayPassed[randomNumber]);"
-        console.log(tempDeck);
+      console.log(tempDeck);
       // }
       return tempDeck;
     } catch (error) {
@@ -142,7 +179,24 @@ function CardsControl() {
   }
 
   //Call functions to fetch firestore data upon component mount
+  //Also makes components draggable
   useEffect(() => {
+    Draggable.create(draggableToolTip.current, {
+      bounds: appBox.current,
+      throwProps: true
+    });
+    Draggable.create(draggableAddCard.current, {
+      bounds: appBox.current,
+      throwProps: true
+    });
+    Draggable.create(draggableSignUp.current, {
+      bounds: appBox.current,
+      throwProps: true
+    });
+    Draggable.create(draggableSignIn.current, {
+      bounds: appBox.current,
+      throwProps: true
+    });
     console.log("re-rendered")
     const fetchData = async () => {
       const cardCollection = await handleGetCards();
@@ -152,64 +206,73 @@ function CardsControl() {
   }, []);
 
   useEffect(() => {
+
+  }, draggableToolTip)
+
+  useEffect(() => {
     console.log("re-renderedx2")
     setCardArray(cardArray.sort(() => Math.random() - 0.5))
-    if(cardArray.length > 7) {
-    const trimmedCollection = generateDeck(cardArray);
-    console.log(trimmedCollection);
-    setCurrentDeck(trimmedCollection);
-    let randomTime = Math.floor(Math.random() * (30000 - 7000 + 1)) + 7000
-    setTimeout(
-      () => 
-      setGenerateMoreCards(prevState => prevState + 1), 
-      randomTime
-    );
-  }
-  
+    if (cardArray.length > 7) {
+      const trimmedCollection = generateDeck(cardArray);
+      console.log(trimmedCollection);
+      setCurrentDeck(trimmedCollection);
+      let randomTime = Math.floor(Math.random() * (30000 - 7000 + 1)) + 7000
+      setTimeout(
+        () =>
+          setGenerateMoreCards(prevState => prevState + 1),
+        randomTime
+      );
+    }
+
   }, [cardArray, generateMoreCards])
 
   return (
     <>
-      <div className="z-50"><NavBar /></div>
-      {/* <div className="absolute z-50"><SignIn/></div> */}
-      <div className=" border-gray-800">
+      <div ref={appBox}>
+        <div className="z-50"><NavBar /></div>
+        {/* <div ref={draggableSignIn} className="absolute z-50"><SignIn/></div> */}
+        <div className="">
+          <div ref={draggableToolTip} className="z-50 left-52 md:absolute border-red-400 border-4">
+            {showToolTip ? <ToolTip
+              setShowToolTip={setShowToolTip} /> : null}</div>
 
-        <div className="left-52 z-45 md:absolute border-red-400 border-4">
-          {showToolTip ? <ToolTip
-            setShowToolTip={setShowToolTip} /> : null}</div>
-        <div className="z-50 md:absolute md:top-9 md:left-1/4 drag">
+          <div ref={draggableAddCard} className="z-40 md:absolute md:top-9 md:left-1/4 drag">
+            {showAddCard ? <AddCard
+              addCard={handleAddCard}
+              setShowAddCard={setShowAddCard} />
+              : null} </div>
 
-          {showAddCard ? <AddCard
-            addCard={handleAddCard}
-            setShowAddCard={setShowAddCard} />
-            : null} </div>
-
-        <div className="absolute z-50 right-72 top-20 border-red-400 border-4">
-          {showSignUp ? <SignUp
-            handleSignUp={handleSignUp}
-            setShowSignUp={setShowSignUp}
-            tempName={generateRandomName} />
-            : null}</div>
-
-        <div className=" z-0 ">
-          <Scene
-            cardArray={cardArray}
-            handleShowingLargeCardFront={handleShowingLargeCardFront}
-            //Determines whether actual card is visible after clicking or not
-            showFollowingCard={showFollowingCard}
-            setFollowingCard={setFollowingCard}
-            showLargeCard={showLargeCard}
-            setShowLargeCard={setShowLargeCard}
-            currentDeck={currentDeck}
-            setCurrentDeck={setCurrentDeck}
-            getCards={handleGetCards}
-            generateDeck={generateDeck}
-            handleKeyPress={handleKeyPress}
-            //Press button to generate more cards
-            setGenerateMoreCards ={setGenerateMoreCards}
-            //Turn card generation on or off
-            setCurrentlyGeneratingCards={setCurrentlyGeneratingCards}
-            largeCardData={largeCardData} />
+          <div ref={draggableSignUp} className="absolute z-30 right-72 top-20 border-red-400 border-4 w-3/4">
+            {/*setShowSignUp can be removed later*/}
+            {/* {auth.currentUser != null ? setShowSignUp(true) : null  } */
+            console.log(auth.currentUser)}
+            {showSignUp ? <SignUp
+              handleSignUp={handleSignUp}
+              setShowSignUp={setShowSignUp}
+              setUserName={setUserName}
+              userName={userName}
+              generateRandomName={generateRandomName} />
+              : null}</div>
+          <div className="z-0">
+            <Scene
+              cardArray={cardArray}
+              handleShowingLargeCardFront={handleShowingLargeCardFront}
+              //Determines whether actual card is visible after clicking or not
+              showFollowingCard={showFollowingCard}
+              setFollowingCard={setFollowingCard}
+              showLargeCard={showLargeCard}
+              setShowLargeCard={setShowLargeCard}
+              currentDeck={currentDeck}
+              setCurrentDeck={setCurrentDeck}
+              getCards={handleGetCards}
+              generateDeck={generateDeck}
+              handleKeyPress={handleKeyPress}
+              //Press button to generate more cards
+              setGenerateMoreCards={setGenerateMoreCards}
+              //Turn card generation on or off
+              setCurrentlyGeneratingCards={setCurrentlyGeneratingCards}
+              largeCardData={largeCardData} />
+          </div>
         </div>
       </div>
     </>

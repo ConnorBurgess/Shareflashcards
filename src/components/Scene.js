@@ -34,6 +34,8 @@ function Scene(props) {
 
   //* For responsiveness
   const [constraints, setContraints] = useState()
+  const [commandBarExtended, setCommandBarExtended] = useState(false)
+
   const [scene, setScene] = useState()
   const handleResize = () => {
     setContraints(boxRef.current.getBoundingClientRect())
@@ -105,6 +107,7 @@ function Scene(props) {
     //// Matter.Events.on(mouseConstraint, "mousedown", (event) => {
     ////   setUserClicks(prevState => prevState + 1)
     //// });
+    extendCommandBar()
 
 
     Runner.run(engine);
@@ -116,7 +119,6 @@ function Scene(props) {
 
     window.addEventListener('resize', handleResize)
   }, [])
-
   //* Responsive canvas
   useEffect(() => {
     if (constraints) {
@@ -151,7 +153,6 @@ function Scene(props) {
   //*Animation for card following mouse 
   //Todo Move all gsap animations to separate component
   function onMouseMove(event) {
-    console.log("LOL")
     if (props.showFollowingCard) {
       var tl = gsap.timeline()
       tl.to(document.querySelector('#floating-card'), {
@@ -164,7 +165,7 @@ function Scene(props) {
         y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
         ease: "power4.out",
       })
-      
+
       // tl.set('#floating-card', {
       //   xPercent: -50,
       //   yPercent: -50
@@ -188,7 +189,7 @@ function Scene(props) {
         y: 200,
         ease: "elastic.out"
       })
-      //// tl.set("#floating-card", { fontSize: '10%' });
+      tl.set("#floating-card", { fontSize: '25%' });
       tl.delay(0.3)
     });
   }
@@ -223,11 +224,13 @@ function Scene(props) {
           y: 0,
           ease: "elastic.out"
         })
-        tl.set("#floating-card", { fontSize: '25%' });
+        tl.set("#floating-card", { fontSize: '100%' });
         tl.delay(0.3)
       });
     }
   }, [props.showLargeCard])
+
+  //Animation for handling bottom command bar
 
   //* Check if user presses gravity button
   //? Should this be removed?
@@ -246,7 +249,7 @@ function Scene(props) {
   useEffect(() => {
     for (let i = 0; i < props.currentDeck.length; i++) {
       //* Random card generation at slightly different times visual effect
-      let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10 
+      let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10
       let randomImage = Math.floor(Math.random() * (56)) + 1;
 
       setTimeout(function () {
@@ -306,14 +309,13 @@ function Scene(props) {
     }
     //// console.log(props.currentDeck);
     //// console.log(props.cardArray)
-  //Todo: Necessary dependencies?    
+    //Todo: Necessary dependencies?    
   }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
 
   //* Animation on card click
   //Todo: Fix to only trigger on clicking div
   useEffect(() => {
     const cardsPopup = document.getElementById("cards-popup");
-    const buttonsPopup = document.getElementById("buttons-popup");
 
     let tl = gsap.timeline()
     tl.delay(1);
@@ -329,19 +331,43 @@ function Scene(props) {
     console.log("clicked on div")
   }
 
+  //Todo: Move to CommandBar.js component
+  const extendCommandBar = (extended) => {
+    const commandBarButtons = document.getElementById("buttons-popup");
+    let tl = gsap.timeline()
+    if (!commandBarExtended || extended) {
+      tl.from(commandBarButtons, { autoAlpha: 0, xPercent: -75, yPercent: 100 })
+      tl.to(commandBarButtons, { autoAlpha: 50, xPercent: 0, duration: 0.3, ease: "Power4.in" })
+      tl.to(commandBarButtons, { autoAlpha: 100, yPercent: -100, duration: 0.6, ease: "Power4.out" })
+      tl.to(commandBarButtons, { yPercent: 0, duration: 0.6, ease: "bounce" })
+      setCommandBarExtended(true);
 
-//Todo: Move to separate component
+    } else if (commandBarExtended || extended) {
+      tl.from(commandBarButtons, { xPercent: 0 })
+      tl.to(commandBarButtons, { yPercent: 100, duration: 0.6, ease: "Power4.in" })
+      tl.to(commandBarButtons, { autoAlpha: 0, xPercent: -100, duration: 1.3, ease: "power4.out" })
+      setCommandBarExtended(false);
+    }
+  }
+  //Todo: Move to separate component
   return (
     <div id="scene" className="flex justify-center relative">
-      {props.showFollowingCard === true ? <div id="floating-card" onClick={handleClick} className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden h-32 top-0 left-0 rounded-sm opacity-90" style={floatingCardStyle}>
-        <div >{props.largeCardData}</div>
-      </div>
+      {props.showFollowingCard === true ?
+        <div id="floating-card" onClick={handleClick}
+          className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden h-32 top-0 left-0 rounded-sm opacity-90 sm:w-1/12"
+          style={floatingCardStyle}>
+          <div >{props.largeCardData}</div>
+        </div>
         : null}
-      <div id="buttons-popup" className="top-2 fixed flex h-16 space bg-gray-700 p-3 shadow-md w-full sm:w-full mx-auto rounded-br-md rounded-bl-md border-2 border-gray-700 ">
-        <div className="sm:left-1/3 fixed ">
-          <button className="text-white ring-green-500 m-2 outline-none select-none text-bold transform hover:scale-105 z-10 " onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
-          <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
-          <button className="text-red-400 m-2 justify-end outline-none select-none animate-pulse text-bold transform hover:scale-105 z-10" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+
+      <div id="command-bar" className="bottom-0 fixed left-0 flex h-16 space bg-gray-900 p-3 shadow-md mx-auto rounded-br-md border-gray-300">
+        <button onClick={() => { extendCommandBar() }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+        <div>
+          <div id="buttons-popup" className="fixed opacity-0 h-16 bottom-0 inline-block w-full bg-gray-900">
+            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10 " onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
+            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
+            <button className="text-red-400 m-2 justify-end outline-none select-none animate-pulse text-bold transform hover:scale-105 z-10" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+          </div>
         </div>
       </div>
       <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className=" fixed p-3 border-r-2 select-none border-gray-700 rounded-r-md h-24 w-4/12 left-0 top-36 sm:w-2/12 sm:h-3/6 bg-gray-700 shadow-lg"><div className="z-50 border-red-400  text-white"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>

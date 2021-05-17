@@ -6,18 +6,23 @@ import images from '../img/index'
 import testcard from '../img/testcard.png'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
-// import randomColor from "randomcolor";
 
-//Holds style for pop up div when hovering over a Matter.js card
+
+//! Current scene.js still needs to be broken up into smaller components and refactored
+//Todo: Refactor and reorganize code
+
+//* Holds style for pop up div when hovering over a Matter.js card
+//? Is this style necessary?
 const floatingCardStyle = {
   backgroundImage: `url(${popup})`,
   backfaceVisibility: "hidden",
   pointerEvents: "none",
 }
 
-//Matter.js scene
-
 function Scene(props) {
+  //* State
+  //? Should this be here?
+  //Todo: Use context with core matter components
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
@@ -27,23 +32,16 @@ function Scene(props) {
   const canvasRef = useRef(null)
 
 
-  //responsive
+  //* For responsiveness
   const [constraints, setContraints] = useState()
   const [scene, setScene] = useState()
   const handleResize = () => {
-    console.log("resizing")
     setContraints(boxRef.current.getBoundingClientRect())
   }
 
-
-  //Handle key events
-  // useEffect(() => {
-  //   console.log("re-rendered")
-  //   console.log(props.cardArray);
-  // }, [props.cardArray]);
   useEffect(() => {
-    console.log("first");
 
+    //* Core matter engine / canvas initialization
     const Engine = Matter.Engine,
       Render = Matter.Render,
       Runner = Matter.Runner,
@@ -56,18 +54,14 @@ function Scene(props) {
       MouseConstraint = Matter.MouseConstraint,
       Composite = Matter.Composite;
 
-    //Add keydown events
-    document.addEventListener("keydown", props.handleKeyPress, false);
-
-    
     let engine = Engine.create({});
     setEngine(engine);
     engine.world.gravity.y = 0.001;
-    
+
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
-      
+
       canvas: canvasRef.current,
       options: {
         showAngleIndicator: false,
@@ -76,41 +70,23 @@ function Scene(props) {
         height: window.innerHeight,
         background: images.background,
         wireframes: false,
-        
+
       },
     })
-    
-    //Add platform
+
+    //* Add platform
     Composite.add(engine.world, [
-      //Green platform
-      // Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46'}, id: "" }),
-      // Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
-      // Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
-      // Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
-      // Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46'}, id: "" }),
-
-      // Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
-      // Bodies.rectangle(500, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(700, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(300, 490, 200, 20, { isStatic: true, showIds: false, render: { fillStyle: '#567d46' }, id: "" }),
-      // Bodies.rectangle(500, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-      // Bodies.rectangle(700, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-      // Bodies.rectangle(900, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-      // Bodies.rectangle(1100, 490, 200, 20, { isStatic: true, render: { fillStyle: '#567d46' }, id: "" }),
-
-      // Bodies.rectangle(300, 550, 200, 100, { isStatic: true, showIds: false, render: { fillStyle: '#9b7653', strokeStyle: 'default' }, id: "" }),
-      // Bodies.rectangle(500, 550, 300, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      Bodies.rectangle(700, 550, 300, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(900, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-      // Bodies.rectangle(1100, 550, 200, 100, { isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, id: "" }),
-
-
+      Bodies.rectangle(700, 550, 300, 100, {
+        isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        }, id: ""
+      }),
 
     ]);
 
-    // Implement mouse control
+    //* Implement mouse control
     var mouse = Mouse.create(render.canvas),
       mouseConstraint = MouseConstraint.create(engine, {
         mouse: mouse,
@@ -125,23 +101,23 @@ function Scene(props) {
     Composite.add(engine.world, mouseConstraint);
     setMouseConstraint(mouseConstraint);
 
-    //Track user clicks
-    Matter.Events.on(mouseConstraint, "mousedown", (event) => {
-      setUserClicks(prevState => prevState + 1)
-    });
+    ////Track user clicks
+    //// Matter.Events.on(mouseConstraint, "mousedown", (event) => {
+    ////   setUserClicks(prevState => prevState + 1)
+    //// });
+
 
     Runner.run(engine);
     Render.run(render);
 
-
-    //Get window constraints for managing responsiveness
+    //* Get window constraints for managing responsiveness
     setContraints(boxRef.current.getBoundingClientRect())
     setScene(render)
 
     window.addEventListener('resize', handleResize)
   }, [])
 
-  //Responsive canvas
+  //* Responsive canvas
   useEffect(() => {
     if (constraints) {
       let { width, height } = constraints
@@ -152,7 +128,8 @@ function Scene(props) {
       scene.canvas.width = width
       scene.canvas.height = height
 
-      //Responsive static bodies
+      //* Responsive static bodies
+      //todo Create responsive static bodies
       const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
       floor.forEach(element => {
         Matter.Body.setPosition(element, {
@@ -162,26 +139,25 @@ function Scene(props) {
       }
       )
     }
-
   }, [scene, constraints])
 
   useEffect(() => {
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-
   }, [])
 
-  //Animation for card following mouse 
+  //*Animation for card following mouse 
+  //Todo Move all gsap animations to separate component
   function onMouseMove(event) {
-    // console.log(props.showFollowingCard)
     if (props.showFollowingCard) {
       var tl = gsap.timeline()
       tl.to(document.querySelector('#floating-card'), {
         opacity: 1.0,
         duration: 0.9,
         scale: 1.0,
-        //responsive default
+        //* Responsive default
+        //? Does this need to be adjusted?
         x: event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 50,
         y: event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200,
         ease: "power4.out",
@@ -189,8 +165,7 @@ function Scene(props) {
     }
   }
 
-
-  //Animation for enlarge card
+  //* Animation for enlarge card
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
       props.setShowLargeCard(true);
@@ -207,12 +182,12 @@ function Scene(props) {
         y: 200,
         ease: "elastic.out"
       })
-      tl.set("#floating-card", { fontSize: '10%' });
+      //// tl.set("#floating-card", { fontSize: '10%' });
       tl.delay(0.3)
     });
   }
 
-  //Animation for hiding enlarged card
+  //* Animation for hiding enlarged card
   useEffect(() => {
     if (mMouseConstraint !== null) {
       Matter.Events.off(mMouseConstraint, "mouseup")
@@ -248,7 +223,8 @@ function Scene(props) {
     }
   }, [props.showLargeCard])
 
-  //Check if user presses gravity button
+  //* Check if user presses gravity button
+  //? Should this be removed?
   useEffect(() => {
     if (mGravity && mEngine !== null) {
       mEngine.world.gravity.y = 0.33;
@@ -256,20 +232,29 @@ function Scene(props) {
     else if (mEngine !== null) {
       mEngine.world.gravity.y = -0.11;
     }
-
   }, [mGravity, mEngine])
+
+  //* Handles card generation
+  //Todo: Move to card generation component
 
   useEffect(() => {
     for (let i = 0; i < props.currentDeck.length; i++) {
+      //* Random card generation at slightly different times visual effect
+      let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10 
+      let randomImage = Math.floor(Math.random() * (56)) + 1;
 
-      //Random card generation at slightly different times for better visual effect
-      let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10 //Random time between 10ms and 400ms
-      let randomImage = Math.floor(Math.random() *(56)) +1;
       setTimeout(function () {
         var newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 35, 50, {
           isStatic: false,
-          angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //Angle is in radians. Randomizes between 0 and 6.28
+          angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
           chamfer: { radius: 1 },
+          density: 0.2,
+          force: { x: 2, y: 3 },
+          collisionFilter: {
+            group: 0,
+            category: 1,
+            mask: 1
+          },
           render: {
             fillStyle: '#374151',
             strokeStyle: '#968786',
@@ -282,14 +267,15 @@ function Scene(props) {
           id: props.currentDeck[props.currentDeck.length - 1].id
         })]);
       }, randomTime);
-
       props.currentDeck.pop();
     }
   }, [props.currentDeck])
 
+  //* Handle adding floating div to mouse movement
+  //Todo: Move to mouse constraint component
   useEffect(() => {
-    console.log(props.cardArray);
-    //Add floating div movement event 
+    ////console.log(props.cardArray);
+    //* Add floating div movement event 
     if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
       Matter.Events.on(mMouseConstraint, "mousedown" || "touchstart", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
@@ -297,27 +283,28 @@ function Scene(props) {
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
-          // console.log(matterCardId)
-          // console.log(props.cardArray);
-
-          //Call function to update floating card with card data
+          //// console.log(matterCardId)
+          //// console.log(props.cardArray);
+          //* Call function to update floating card with card data
           if (matterCardId !== undefined) {
             console.log(matterCardId);
             props.handleShowingLargeCardFront(matterCardId)
           }
           // //Add listener to make floating card follow mouse
           document.querySelector('#scene').addEventListener('touchmove', onMouseMove)
-          // document.getElementById('floating-card').addEventListener(handleClick)
-
+          //// document.getElementById('floating-card').addEventListener(handleClick)
           //Add mouse event to make card enlarge
           document.querySelector('#scene').addEventListener('touchend', onRelease)
         }
       });
     }
-    // console.log(props.currentDeck);
-    // console.log(props.cardArray)
-  }, [mEngine, mMouseConstraint, props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
+    //// console.log(props.currentDeck);
+    //// console.log(props.cardArray)
+  //Todo: Necessary dependencies?    
+  }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
 
+  //* Animation on card click
+  //Todo: Fix to only trigger on clicking div
   useEffect(() => {
     const cardsPopup = document.getElementById("cards-popup");
     const buttonsPopup = document.getElementById("buttons-popup");
@@ -331,13 +318,16 @@ function Scene(props) {
     tl.repeat(1);
 
   }, [props.CardArray])
-
+  //Todo: Implement
   const handleClick = () => {
     console.log("clicked on div")
   }
+
+
+//Todo: Move to separate component
   return (
-    <div id="scene" className="flex justify-center relative ">
-      {props.showFollowingCard === true ? <div id="floating-card" onClick={handleClick} className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden h-32 top-0 left-0 rounded-sm opacity-90"  style={floatingCardStyle}>
+    <div id="scene" className="flex justify-center relative">
+      {props.showFollowingCard === true ? <div id="floating-card" onClick={handleClick} className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden h-32 top-0 left-0 rounded-sm opacity-90" style={floatingCardStyle}>
         <div >{props.largeCardData}</div>
       </div>
         : null}

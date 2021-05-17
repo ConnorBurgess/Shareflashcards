@@ -142,6 +142,7 @@ function Scene(props) {
   }, [scene, constraints])
 
   useEffect(() => {
+    console.log(props.isMobile);
     return () => {
       window.removeEventListener('resize', handleResize)
     }
@@ -150,6 +151,7 @@ function Scene(props) {
   //*Animation for card following mouse 
   //Todo Move all gsap animations to separate component
   function onMouseMove(event) {
+    console.log("LOL")
     if (props.showFollowingCard) {
       var tl = gsap.timeline()
       tl.to(document.querySelector('#floating-card'), {
@@ -158,10 +160,15 @@ function Scene(props) {
         scale: 1.0,
         //* Responsive default
         //? Does this need to be adjusted?
-        x: event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 50,
-        y: event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200,
+        x: props.isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 : event.offsetX + 50,
+        y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
         ease: "power4.out",
       })
+      
+      // tl.set('#floating-card', {
+      //   xPercent: -50,
+      //   yPercent: -50
+      // })
     }
   }
 
@@ -169,9 +176,8 @@ function Scene(props) {
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
       props.setShowLargeCard(true);
-      document.querySelector('#scene').removeEventListener('touchmove', onMouseMove);
-      document.querySelector('#scene').removeEventListener('mouseup', onRelease);
-      document.querySelector('#scene').removeEventListener('touchend', onRelease);
+      document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove);
+      document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease);
       let tl = gsap.timeline()
       tl.delay(1);
       tl.to(document.querySelector('#floating-card'), {
@@ -217,7 +223,7 @@ function Scene(props) {
           y: 0,
           ease: "elastic.out"
         })
-        tl.set("#floating-card", { fontSize: '10%' });
+        tl.set("#floating-card", { fontSize: '25%' });
         tl.delay(0.3)
       });
     }
@@ -277,7 +283,7 @@ function Scene(props) {
     ////console.log(props.cardArray);
     //* Add floating div movement event 
     if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
-      Matter.Events.on(mMouseConstraint, "mousedown" || "touchstart", (event) => {
+      Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
 
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
@@ -291,10 +297,10 @@ function Scene(props) {
             props.handleShowingLargeCardFront(matterCardId)
           }
           // //Add listener to make floating card follow mouse
-          document.querySelector('#scene').addEventListener('touchmove', onMouseMove)
+          document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
           //// document.getElementById('floating-card').addEventListener(handleClick)
           //Add mouse event to make card enlarge
-          document.querySelector('#scene').addEventListener('touchend', onRelease)
+          document.querySelector('#scene').addEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease)
         }
       });
     }
@@ -355,6 +361,7 @@ function Scene(props) {
   )
 }
 Scene.propTypes = {
+  isMobile: PropTypes.bool,
   getCards: PropTypes.func,
   generateDeck: PropTypes.func
 };

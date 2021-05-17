@@ -31,8 +31,8 @@ function CardsControl() {
 
   //Holds card data which is updated when card is enlarged
   const [largeCardData, setLargeCardData] = useState(<>
-    <h1 className="text-center text-">Placeholder Flashcard</h1>
-    <h1 className="text-center">by Ruthless Butterscotch</h1>
+    <h1 className="text-center text-">About Card Hunts</h1>
+    <h1 className="text-center"><a href="github.com/ConnorBurgess">Connor Burgess</a></h1>
     <br />
     <div className="ml-4 mr-4 text-sm">
       <p>Why did the chicken cross the road?</p>
@@ -48,10 +48,6 @@ function CardsControl() {
 
   //Generates a new username when user clicks button
   const [userName, setUserName] = useState(null);
-
-  //Side UI popups
-  const [popUp, setPopUp] = useState(false);
-
   //Draggable element refs
   //put refs in an array later
   const draggableRefs = useRef([])
@@ -61,21 +57,18 @@ function CardsControl() {
   const draggableAddCard = useRef(null);
 
   const appBox = useRef(null);
-
   const handleShowingLargeCardFront = (id) => {
     console.log(cardArray);
+    console.log("showing front")
     const clickedCard = cardArray.find(e => e.id === id);
     if (clickedCard != undefined) {
     setLargeCardData(
-      <><div className="bg-red-400">
-        <h1 className="text-center text-red-500">{clickedCard.data.title}</h1>
+      <><div className="border-4">
+        <h1 className="text-center text-white">{clickedCard.data.title}</h1>
         <h1 className="text-center">by Ruthless Butterscotch</h1>
         <br />
-        <div className="ml-4 mr-4">
-          <p>{clickedCard.data.front}</p><div>
-            <button className="transform hover:scale-105 z-50" onClick={() => console.log("Saving card...")}>Save it</button><span className="ml-1">👋</span>
-            <button className="absolute md:left-2/3 sm:left-2/4 my-3   text-bold transform hover:scale-105 z-0">testtttt cards</button>
-          </div>
+        <div className="ml-4 mr-4 border-4 flex w-auto">
+         {clickedCard.data.front}
         </div>
       </div>
       </>)
@@ -83,6 +76,20 @@ function CardsControl() {
   }
 
   //Fetch firestore data and make components draggable upon component mount
+  const activateVeil = (truthy) => {
+    var tl = gsap.timeline()
+    const veil = document.getElementById("veil");
+    if (truthy) {
+    tl.to(veil, {
+      duration: 2.0,
+      autoAlpha: 0.44
+    })}
+  else {
+    tl.to(veil, {
+      duration: 1.0,
+      autoAlpha: 0
+    })}
+  }
   useEffect(() => {
     Draggable.create(draggableToolTip.current, {
       bounds: appBox.current,
@@ -90,15 +97,19 @@ function CardsControl() {
     });
     Draggable.create(draggableAddCard.current, {
       bounds: appBox.current,
-      throwProps: true
+      throwProps: true,
+      dragClickables: false
+
     });
     Draggable.create(draggableSignUp.current, {
       bounds: appBox.current,
-      throwProps: true
+      throwProps: true,
+      dragClickables: false
     });
     Draggable.create(draggableSignIn.current, {
       bounds: appBox.current,
-      throwProps: true
+      throwProps: true,
+      dragClickables: false
     });
 
     const fetchData = async () => {
@@ -129,20 +140,25 @@ function CardsControl() {
         {/* <div className="z-50"><NavBar /></div> */}
         {/* <div ref={draggableSignIn} className="absolute z-50"><SignIn/></div> */}
         <div className="">
-          <div ref={draggableToolTip} className="z-50 left-52 md:absolute">
+          <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
+          {showToolTip ? activateVeil(true) : null}
             {showToolTip ? <ToolTip
               setShowToolTip={setShowToolTip} /> : null}</div>
-
           <div ref={draggableAddCard} className="z-40 md:absolute md:top-9 md:left-1/4 drag">
+          {showAddCard ? activateVeil(true) : null}
             {showAddCard ? <AddCard
               addCard={handleAddCard}
-              setShowAddCard={setShowAddCard} />
+              setShowAddCard={setShowAddCard} 
+              activateVeil={activateVeil}
+              />
               : null} </div>
-
+            <div id="veil" className=" opacity-40 h-full w-full z-30 bg-gray-800 absolute"></div>
           <div ref={draggableSignUp} className="absolute m-20 z-30 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
             {/*setShowSignUp can be removed later*/}
             {/* {auth.currentUser != null ? setShowSignUp(true) : null  } */}
-            {showSignUp ? <SignUp
+            {showSignUp ? activateVeil(true) : activateVeil(false) }
+            {showSignUp ? 
+            <SignUp
               handleSignUp={handleSignUp}
               setShowSignUp={setShowSignUp}
               setUserName={setUserName}

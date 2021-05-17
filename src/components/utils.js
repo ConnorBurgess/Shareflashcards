@@ -38,7 +38,7 @@ export const handleAddCard = (event) => {
       front: event.target.front.value,
       back: event.target.back.value
     })
-    return false;
+  return false;
 }
 
 //* Handles GET card data from firestore
@@ -71,17 +71,34 @@ export const generateDeck = (cardArrayPassed) => {
 }
 
 // Handles signing up
-  export const handleSignUp = newUser => {
-    newUser.preventDefault();
-    firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
-    var user = firebase.auth().currentUser;
-    user.updateProfile({
-      displayName: newUser.target.userName.value
-    })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorCode);
-        console.log(errorMessage);
-      });
+export const handleSignUp = newUser => {
+  newUser.preventDefault();
+  firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
+  var user = firebase.auth().currentUser;
+  user.updateProfile({
+    displayName: newUser.target.userName.value
+  })
+    .catch((error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode);
+      console.log(errorMessage);
+    });
+}
+
+// *Check device size
+export const deviceDetect = () => {
+  const userAgent =
+    typeof window.navigator === "undefined" ? "" :
+      navigator.userAgent;
+  if (userAgent != "") {
+    const mobile = Boolean(userAgent.match(
+      /Android|BlackBerry|iPhone|iPad|iPod|Opera|Mini|IEMobile|WPDesktop/i
+    )
+    );
+    return mobile
   }
+  else {
+    return false;
+  }
+}

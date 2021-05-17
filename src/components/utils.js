@@ -11,6 +11,7 @@ export const generateRandomName = () => {
 }
 
 //Keypress handlers
+//! Probably not necessary, should delete
 //Not yet implemented
 export const handleKeyPress = (event) => {
   if (event.key === 'z') {
@@ -28,7 +29,7 @@ export const handleKeyPress = (event) => {
   }
 }
 
-//Handles adding a new card to firestore
+//* Handles adding a new card to firestore
 export const handleAddCard = (event) => {
   event.preventDefault();
   firestore.collection("cards")
@@ -40,7 +41,7 @@ export const handleAddCard = (event) => {
     return false;
 }
 
-//Handles GET card data from firestore
+//* Handles GET card data from firestore
 export const handleGetCards = async () => {
   try {
     const cardCollection = await firestore.collection("cards").get().then((entry) => {
@@ -56,8 +57,9 @@ export const handleGetCards = async () => {
   }
 }
 
-//Intended to run after handleGetCards in order to generate a random deck off the cards db
-//Currently just randomizes the order of the whole deck data
+//* Intended to run after handleGetCards in order to generate a random deck off the cards db
+//! Currently just sorts the whole deck data
+//Todo: Implement to only generate off specfic tags
 export const generateDeck = (cardArrayPassed) => {
   try {
     const tempDeck = cardArrayPassed.map(x => { return x }).sort();
@@ -68,7 +70,7 @@ export const generateDeck = (cardArrayPassed) => {
   }
 }
 
-//Handles signing up
+// Handles signing up
   export const handleSignUp = newUser => {
     newUser.preventDefault();
     firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)

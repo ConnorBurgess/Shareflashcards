@@ -1,9 +1,9 @@
 # Cards
 #### Created By: Connor Burgess 
 * * *
-
+* Heavily WIP, very buggy / code needs to be refactored and separated to components 5.18.21
 ## Description  
-Web application allowing users to contribute flash cards to community and send cards to friends. Uses Matter.js physics engine to allow users to explore database visually and build sets off discovered cards. Site built using React and styled with Tailwind. Backend NOSQL database managed through Firebase.
+Responsive web application allowing users to contribute flash cards to community and send cards to friends. Uses Matter.js physics engine to allow users to explore database visually and build sets off discovered cards. Site built using React and styled with Tailwind. Backend NOSQL database managed through Firebase.
 * * *
 
 ## User Stories
@@ -14,14 +14,16 @@ Web application allowing users to contribute flash cards to community and send c
 * As a user, I want to be able to review cards in saved decks.
 
 ## Technologies used
+* JavaScript
 * React
 * Matter.js
-* JavaScript
-* Tailwind
 * HTML
 * CSS
+* Tailwind
+* GSAP
 * npm
 * BrowserFS
+* Better Comments
 * Create React App
 
 * * *
@@ -33,6 +35,12 @@ Web application allowing users to contribute flash cards to community and send c
 ## Additional comments:
 * Created on 5/12/21  
 * * *
+
+## *Known bugs:*
+| Bug | Reason | Possible solution  | State (fixed/current)|
+| :-------------: |  :------------: | :-------------: |:-------------: |
+| Matter mouse events continually adding events to mMouseConstraint | Need to look over event handlers in Scene.js | Fix event handlers | ❌  **Current**|
+
 
 ## License:
 > *&copy; Connor Burgess, 2021*

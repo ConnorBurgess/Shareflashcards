@@ -6,7 +6,7 @@ import images from '../img/index'
 import testcard from '../img/testcard.png'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
-
+import {handleUpdatingFirestoreCards} from './utils'
 
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
@@ -27,6 +27,7 @@ function Scene(props) {
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
   const [userClicks, setUserClicks] = useState(1);
+  const [matterCard, setMatterCardId] = useState(null);
 
   const boxRef = useRef(null)
   const canvasRef = useRef(null)
@@ -201,6 +202,8 @@ function Scene(props) {
     }
     if (mMouseConstraint != null && props.showLargeCard) {
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
+        handleUpdatingFirestoreCards(matterCard)
+
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
         let tl = gsap.timeline()
@@ -215,8 +218,6 @@ function Scene(props) {
         })
         tl.to(saveIcon, {
           opacity: 1.0,
-          perspective: 800,
-          perspectiveOrigin: '50% 50% 0px',
           duration: 0.3,
           scale: 2.0,
           rotate: 360,
@@ -224,8 +225,6 @@ function Scene(props) {
         })
         tl.to(saveIcon, {
           opacity: 1.0,
-          perspective: 800,
-          perspectiveOrigin: '50% 50% 0px',
           duration: 0.4,
           scale: 0,
           rotate: 360,
@@ -335,6 +334,7 @@ function Scene(props) {
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
+          setMatterCardId(matterCardId)
           //// console.log(matterCardId)
           //// console.log(props.cardArray);
           //* Call function to update floating card with card data

@@ -7,21 +7,22 @@ import SignIn from './SignIn';
 import SignUp from './SignUp';
 import firebase, { firestore, auth } from '../firebase';
 import react, { useState, useEffect, useRef } from 'react';
-import { generateRandomName, handleAddCard, handleKeyPress, handleGetCards, generateDeck, handleSignUp } from './utils';
+import { generateRandomName, handleAddCard, handleKeyPress, handleGetCards, generateDeck, handleSignUp, deviceDetect } from './utils';
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
 function CardsControl() {
 
- //* Handle display of different components
+  //* Handle display of different  components
+
   const [showToolTip, setShowToolTip] = useState(false);
-  const [showAddCard, setShowAddCard] = useState(true);
-  const [showSignUp, setShowSignUp] = useState(false);
+  const [showAddCard, setShowAddCard] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(true);
   const [showSignIn, setShowSignIn] = useState(false);
- 
- //* CardArray all DB cards and currentdeck is intended to hold a smaller subset deck
- //Todo: CurrentDeck is just a sorted cardArray in current implementation
+
+  //* CardArray all DB cards and currentdeck is intended to hold a smaller subset deck
+  //Todo: CurrentDeck is just a sorted cardArray in current implementation
 
   const [cardArray, setCardArray] = useState([{}]);
   const [currentDeck, setCurrentDeck] = useState([]);
@@ -55,12 +56,14 @@ function CardsControl() {
   //? Does this need to be here?
   const [userName, setUserName] = useState(null);
 
+  //* Responsiveness
+  const [isMobile, setIsMobile] = useState(false);
 
   /**
    * * Draggable elements
    * Todo: Put refs in an array 
   */
-  const draggableRefs = useRef([])
+  // const draggableRefs = useRef([])
   const draggableToolTip = useRef(null);
   const draggableSignIn = useRef(null);
   const draggableSignUp = useRef(null);
@@ -73,13 +76,20 @@ function CardsControl() {
     const clickedCard = cardArray.find(e => e.id === id);
     if (clickedCard != undefined) {
       setLargeCardData(
-        <><div className="border-4">
-          <h1 className="text-center text-white">{clickedCard.data.title}</h1>
-          <h1 className="text-center">by Ruthless Butterscotch</h1>
+        <><div className="relative justify-items-center">
+          <div className="text-center">
+            <span className=" ">{clickedCard.data.title} </span>
+            <span> 05/17/21</span>
+          </div>
+          <h1 className="text-center italic text-bold">Ruthless Butterscotch wrote...</h1>
+          <hr className="bg-gray-700" />
           <br />
-          <div className="ml-4 mr-4 border-4 flex w-auto">
+          <div className="ml-1 mr-1 flex mb-7">
             {clickedCard.data.front}
           </div>
+          <hr />
+          <div className="text-center">Reveal back</div>
+          <hr />
         </div>
         </>)
     }
@@ -132,12 +142,14 @@ function CardsControl() {
       dragClickables: false
     });
 
-    //Fetch firestore data on mount
+    //* Fetch firestore data on mount
     const fetchData = async () => {
       const cardCollection = await handleGetCards();
       setCardArray(cardCollection);
     }
     fetchData();
+    setIsMobile(deviceDetect());
+    //* 
   }, []);
 
   useEffect(() => {
@@ -158,7 +170,7 @@ function CardsControl() {
   return (
     <>
       <div ref={appBox}>
-        {/* <div className="z-50"><NavBar /></div> */}
+        <div className="z-40 absolute w-full"><NavBar isMobile={isMobile} /></div>
         {/* <div ref={draggableSignIn} className="absolute z-50"><SignIn/></div> */}
         <div className="">
           <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
@@ -177,7 +189,7 @@ function CardsControl() {
               />
               : null} </div>
           <div id="veil" className=" opacity-40 h-full w-full z-30 bg-gray-800 absolute"></div>
-          <div ref={draggableSignUp} className="absolute m-20 z-30 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
+          <div ref={draggableSignUp} className="absolute m-20 z-50 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
             {/*setShowSignUp can be removed later*/}
             {/* {auth.currentUser != null ? setShowSignUp(true) : null  } */}
             {showSignUp ? activateVeil(true) : activateVeil(false)}
@@ -191,6 +203,7 @@ function CardsControl() {
               : null}</div>
           <div className="z-0">
             <Scene
+              isMobile={isMobile}
               cardArray={cardArray}
               handleShowingLargeCardFront={handleShowingLargeCardFront}
               //Determines whether actual card is visible after clicking or not

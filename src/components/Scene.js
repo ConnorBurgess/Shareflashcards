@@ -159,8 +159,7 @@ function Scene(props) {
         opacity: 1.0,
         duration: 0.9,
         scale: 1.0,
-        //* Responsive default
-        //? Does this need to be adjusted?
+        //* Responsive x/y
         x: props.isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 : event.offsetX + 50,
         y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
         ease: "power4.out",
@@ -185,8 +184,8 @@ function Scene(props) {
         opacity: 1.0,
         duration: 1.7,
         scale: 3.0,
-        x: 140,
-        y: 200,
+        x: props.isMobile ? 140 : event.offsetX,
+        y: props.isMobile ? 200 : event.offsetY,
         ease: "elastic.out"
       })
       tl.set("#floating-card", { fontSize: '25%' });
@@ -195,16 +194,43 @@ function Scene(props) {
   }
 
   //* Animation for hiding enlarged card
+  //Todo: Improve coords of animations
   useEffect(() => {
     if (mMouseConstraint !== null) {
       Matter.Events.off(mMouseConstraint, "mouseup")
     }
     if (mMouseConstraint != null && props.showLargeCard) {
-      Matter.Events.on(mMouseConstraint, "mousedown", () => {
+      Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
         let tl = gsap.timeline()
-        tl.delay(1);
+        const saveIcon = document.getElementById("save-icon");
+        tl.from(saveIcon, {
+          perspective: 800,
+          perspectiveOrigin: '50% 50% 0px',
+          duration: 0.3,
+          scale: 0.0,
+          rotate: 360,
+          ease: "elastic.out"
+        })
+        tl.to(saveIcon, {
+          opacity: 1.0,
+          perspective: 800,
+          perspectiveOrigin: '50% 50% 0px',
+          duration: 0.3,
+          scale: 2.0,
+          rotate: 360,
+          ease: "elastic.out"
+        })
+        tl.to(saveIcon, {
+          opacity: 1.0,
+          perspective: 800,
+          perspectiveOrigin: '50% 50% 0px',
+          duration: 0.4,
+          scale: 0,
+          rotate: 360,
+          ease: "elastic.out"
+        })
         tl.to(document.querySelector('#floating-card'), {
           opacity: 1.0,
           transformStyle: "preserve-3d",
@@ -220,12 +246,27 @@ function Scene(props) {
           opacity: 1.0,
           duration: 1.0,
           scale: 0,
-          x: 300,
-          y: 0,
+          x: props.isMobile ? 300 : 355,
+          y: props.isMobile ? 0 : -15,
           ease: "elastic.out"
         })
         tl.set("#floating-card", { fontSize: '100%' });
-        tl.delay(0.3)
+        const saveNav = document.getElementById("saved-nav")
+        tl.to(saveNav, {
+          duration: 0.3,
+          color: "red",
+          scale: 2.0,
+          rotate: 30,
+          ease: "power4.out"
+        })
+        tl.to(saveNav, {
+          duration: 0.3,
+          scale: 1,
+          color: "white",
+          rotate: 0,
+          rotate: 0,
+          ease: "power4.in"
+        })
       });
     }
   }, [props.showLargeCard])
@@ -287,8 +328,10 @@ function Scene(props) {
     //* Add floating div movement event 
     if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
+        console.log(event.source.constraint.pointA.x);
+        event.source.constraint.pointA.x > constraints.width / 2 ? console.log("right side") : console.log("left side")
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
-
+        // event.width > event.width/2 ? console.log("right side)")
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
@@ -312,7 +355,7 @@ function Scene(props) {
     //Todo: Necessary dependencies?    
   }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
 
-  //* Animation on card click
+  //* Animation for card popup
   //Todo: Fix to only trigger on clicking div
   useEffect(() => {
     const cardsPopup = document.getElementById("cards-popup");

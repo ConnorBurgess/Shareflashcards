@@ -18,7 +18,7 @@ function CardsControl() {
 
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(true);
+  const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
 
   //* CardArray all DB cards and currentdeck is intended to hold a smaller subset deck
@@ -35,11 +35,10 @@ function CardsControl() {
 
   //* Holds card data which is updated when card is enlarged
   const [largeCardData, setLargeCardData] = useState(<>
-    <h1 className="text-center text-">About Card Hunts</h1>
-    <h1 className="text-center"><a href="github.com/ConnorBurgess">Connor Burgess</a></h1>
+    <h1 className="text-center"></h1>
     <br />
     <div className="ml-4 mr-4 text-sm">
-      <p>Why did the chicken cross the road?</p>
+      <p></p>
       <p classname="">{showLargeCard ? "Click to view " : null}</p>
     </div>
   </>);
@@ -71,35 +70,22 @@ function CardsControl() {
   const appBox = useRef(null);
 
   const handleShowingLargeCardFront = (id) => {
-    console.log(cardArray);
-    console.log("showing front")
     const clickedCard = cardArray.find(e => e.id === id);
     if (clickedCard != undefined) {
       setLargeCardData(
-        <><div className="relative justify-items-center">
+        <><div className="relative justify-items-center ml-4 mr-4 my-4 rounded-md">
           <div className="text-center">
-            <span className=" ">{clickedCard.data.title} </span>
+            <h1 className="font-bold">{clickedCard.data.title} </h1>
             <span> 05/17/21</span>
           </div>
-          <h1 className="text-center italic text-bold">Ruthless Butterscotch wrote...</h1>
-          <hr className="bg-gray-700" />
+          <h2 className="text-center italic text-bold mb-2 mr-2">Ruthless Butterscotch</h2>
           <br />
           <div className="ml-1 mr-1 flex mb-7">
             {clickedCard.data.front}
           </div>
-          <hr />
-          <div className="text-center">Reveal back</div>
-          <hr />
         </div>
         </>)
     }
-  }
-
-  const handleHidingForm = () => {
-    return showToolTip ? setShowToolTip(!showToolTip)
-      : showAddCard ? setShowAddCard(!showAddCard)
-        : showSignUp ? setShowSignUp(!showSignUp)
-          : showSignIn ? setShowSignIn(!showSignIn) : null
   }
 
   //* Fetch firestore data and make components draggable upon component mount
@@ -178,11 +164,10 @@ function CardsControl() {
             {showToolTip ?
               <ToolTip
                 setShowToolTip={setShowToolTip} /> : null}</div>
-          <div ref={draggableAddCard} className="z-40 absolute md:top-9 md:left-1/4 drag sm:w-1/2 top-0">
+          <div ref={draggableAddCard} className="z-40 absolute md:top-9 left-4 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6">
             {showAddCard ? activateVeil(true) : null}
             {showAddCard ?
               <AddCard
-                handleHidingForm={handleHidingForm}
                 addCard={handleAddCard}
                 setShowAddCard={setShowAddCard}
                 activateVeil={activateVeil}

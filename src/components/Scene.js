@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
-import background from '../img/background.jpg'
 import popup from '../img/popup.jpg'
 import images from '../img/index'
-import testcard from '../img/testcard.png'
+import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
 import {handleUpdatingFirestoreCards} from './utils'
@@ -14,9 +13,11 @@ import {handleUpdatingFirestoreCards} from './utils'
 //* Holds style for pop up div when hovering over a Matter.js card
 //? Is this style necessary?
 const floatingCardStyle = {
-  backgroundImage: `url(${popup})`,
+  backgroundImage: `url(${images.blank_card})`,
   backfaceVisibility: "hidden",
   pointerEvents: "none",
+  object_fit: "contain",
+  backgroundSize:"100%"
 }
 
 function Scene(props) {
@@ -79,11 +80,16 @@ function Scene(props) {
 
     //* Add platform
     Composite.add(engine.world, [
-      Bodies.rectangle(700, 550, 300, 100, {
-        isStatic: true, render: { fillStyle: '#9b7653', strokeStyle: 'red' }, collisionFilter: {
+      Bodies.rectangle(700, 550, 700, 10, {
+        isStatic: true, render: { fillStyle: '#054D52', strokeStyle: 'red' },           chamfer: { radius: 15 },  collisionFilter: {
           group: 0,
           category: 1,
           mask: 1
+        }, id: ""
+      }),
+      Bodies.rectangle(700, 550, 700, 10, {
+        isStatic: true, render: { fillStyle: '#054D52', strokeStyle: 'red' },           chamfer: { radius: 15 },  collisionFilter: {
+
         }, id: ""
       }),
 
@@ -253,7 +259,7 @@ function Scene(props) {
         const saveNav = document.getElementById("saved-nav")
         tl.to(saveNav, {
           duration: 0.3,
-          color: "red",
+          color: "#A75248",
           scale: 2.0,
           rotate: 30,
           ease: "power4.out"
@@ -293,7 +299,7 @@ function Scene(props) {
       let randomImage = Math.floor(Math.random() * (56)) + 1;
 
       setTimeout(function () {
-        var newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 35, 50, {
+        var newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
           isStatic: false,
           angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
           chamfer: { radius: 1 },
@@ -307,10 +313,10 @@ function Scene(props) {
           render: {
             fillStyle: '#374151',
             strokeStyle: '#968786',
-            chamfer: { radius: 4 },
+            chamfer: { radius: 9 },
             lineWidth: 2,
             sprite: {
-              texture: images[randomImage],
+              texture: blank_card_small,
             }
           },
           id: props.currentDeck[props.currentDeck.length - 1].id
@@ -397,7 +403,7 @@ function Scene(props) {
     <div id="scene" className="flex justify-center relative">
       {props.showFollowingCard === true ?
         <div id="floating-card" onClick={handleClick}
-          className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden h-32 top-0 left-0 rounded-sm opacity-90 sm:w-1/12"
+          className="z-50 absolute w-4/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-42 sm:h-40 top-0 left-0 rounded-sm opacity-90 sm:w-1/12"
           style={floatingCardStyle}>
           <div >{props.largeCardData}</div>
         </div>

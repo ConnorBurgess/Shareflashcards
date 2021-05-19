@@ -59,8 +59,6 @@ export const generateDeck = (cardArrayPassed) => {
 //* Handles signing up
 export const handleSignUp = async newUser => {
   newUser.preventDefault();
-
-
   await firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
   var user = await firebase.auth().currentUser;
   user.updateProfile({
@@ -79,6 +77,17 @@ export const handleSignUp = async newUser => {
       console.log(errorMessage);
     });
     console.log(user);
+}
+
+//* Handles sign out
+export const handleSignOut = async user => {
+  firebase.auth().signOut().then(() => {
+    console.log("signout successful")
+    // Sign-out successful.
+  }).catch((error) => {
+    // An error happened.
+  });
+  
 }
 
 //* Handle updating user card data

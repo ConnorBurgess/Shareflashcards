@@ -10,34 +10,20 @@ export const generateRandomName = () => {
   return name;
 }
 
-//Keypress handlers
-//! Probably not necessary, should delete
-//Not yet implemented
-export const handleKeyPress = (event) => {
-  if (event.key === 'z') {
-    //Freezes all items in world
-    // if (event.key === 'f') {
-    //   this.state.worldBodies.forEach((item) => {
-    //     item.isSleeping = true;
-    //   })
-    // }
-    if (event.key === 's') {
-      // this.state.worldBodies.forEach((item) => {
-      //   item.isSleeping = false;
-      // })
-    }
-  }
-}
-
 //* Handles adding a new card to firestore
 export const handleAddCard = (event) => {
   event.preventDefault();
+  try {
   firestore.collection("cards")
     .add({
       title: event.target.title.value,
       front: event.target.front.value,
-      back: event.target.back.value
+      back: event.target.back.value,
+      created: firebase.firestore.FieldValue.serverTimeStamp
     })
+  } catch (err) {
+    console.log(err)
+  }
   return false;
 }
 
@@ -70,23 +56,45 @@ export const generateDeck = (cardArrayPassed) => {
   }
 }
 
-// Handles signing up
-export const handleSignUp = newUser => {
+//* Handles signing up
+export const handleSignUp = async newUser => {
   newUser.preventDefault();
-  firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
-  var user = firebase.auth().currentUser;
+
+
+  await firebase.auth().createUserWithEmailAndPassword(newUser.target.email.value, newUser.target.password.value)
+  var user = await firebase.auth().currentUser;
   user.updateProfile({
     displayName: newUser.target.userName.value
   })
-    .catch((error) => {
+  firestore.collection("users")
+  .doc(user.uid).set({
+    displayName: newUser.target.userName.value,
+    savedCards: {},
+    friendCode: "test", // Todo: Implement salted hash
+  })
+  .catch((error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
       console.log(errorCode);
       console.log(errorMessage);
     });
+    console.log(user);
 }
 
-// *Check device size
+//* Handle updating user card data
+export const handleUpdatingFirestoreCards = async cardId => {
+
+  try {
+    const currentUser = await firebase.auth().currentUser;
+    if (currentUser.uid != undefined) {
+      await firestore.collection("users").doc(currentUser.uid).update({ "savedCards" : firebase.firestore.FieldValue.arrayUnion(cardId)})
+    }
+  } catch (err) {
+    console.log(err)
+  }
+
+}
+// *Check device size for responsiveness
 export const deviceDetect = () => {
   const userAgent =
     typeof window.navigator === "undefined" ? "" :

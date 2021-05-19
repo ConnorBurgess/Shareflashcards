@@ -79,20 +79,51 @@ function Scene(props) {
     })
 
     //* Add platform
+    
     Composite.add(engine.world, [
-      Bodies.rectangle(700, 550, 700, 10, {
-        isStatic: true, render: { fillStyle: '#054D52', strokeStyle: 'red' },           chamfer: { radius: 15 },  collisionFilter: {
+      Bodies.rectangle(700, 550, 145, 35, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
           group: 0,
           category: 1,
           mask: 1
         }, id: ""
       }),
-      Bodies.rectangle(700, 550, 700, 10, {
-        isStatic: true, render: { fillStyle: '#054D52', strokeStyle: 'red' },           chamfer: { radius: 15 },  collisionFilter: {
-
+      Bodies.rectangle(700, 550, 700, 130, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
         }, id: ""
       }),
-
+      Bodies.rectangle(700, 550, 50, 110, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+        }, id: ""
+      }),
+      Bodies.rectangle(700, 550, 50, 110, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+        }, id: ""
+      }),
+      Bodies.rectangle(700, 550, 140, 50, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        }, id: ""
+      }),
+      Bodies.rectangle(700, 550, 100, 50, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        }, id: ""
+      }),
+      Bodies.rectangle(700, 550, 55, 47, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        }, id: ""
+      })
     ]);
 
     //* Implement mouse control
@@ -140,13 +171,34 @@ function Scene(props) {
       //* Responsive static bodies
       //todo Create responsive static bodies
       const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
-      floor.forEach(element => {
-        Matter.Body.setPosition(element, {
+        Matter.Body.setPosition(floor[0], {
           x: width / 2,
-          y: height - 100,
+          y: height - 200,
         })
-      }
-      )
+        Matter.Body.setPosition(floor[1], {
+          x: width / 2,
+          y: height - 50,
+        })
+        Matter.Body.setPosition(floor[2], {
+          x: width / 2,
+          y: height - 60,
+        })
+        Matter.Body.setPosition(floor[3], {
+          x: width / 2,
+          y: height - 160,
+        })
+        Matter.Body.setPosition(floor[4], {
+          x: width / 2,
+          y: height - 220,
+        })
+        Matter.Body.setPosition(floor[5], {
+          x: width / 2,
+          y: height - 240,
+        })
+        Matter.Body.setPosition(floor[6], {
+          x: width / 2,
+          y: height - 250,
+        })
     }
   }, [scene, constraints])
 
@@ -403,7 +455,7 @@ function Scene(props) {
     <div id="scene" className="flex justify-center relative">
       {props.showFollowingCard === true ?
         <div id="floating-card" onClick={handleClick}
-          className="z-50 absolute w-4/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-42 sm:h-40 top-0 left-0 rounded-sm opacity-90 sm:w-1/12"
+          className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
           <div >{props.largeCardData}</div>
         </div>

@@ -15,16 +15,16 @@ import { handleUpdatingFirestoreCards } from './utils'
 const floatingCardStyle = {
   backgroundImage: `url(${images.blank_card})`,
   backfaceVisibility: "hidden",
-  pointerEvents: "none",
   object_fit: "cover",
+  overflow: "hidden",
   backgroundSize: "100%",
   backgroundRepeat: "no-repeat"
 }
 
 function Scene(props) {
-  //* State
+
   //? Should this be here?
-  //Todo: Use context with core matter components
+  //Todo: Use context with core matter components and otherwise refactor state
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
@@ -35,7 +35,7 @@ function Scene(props) {
   const canvasRef = useRef(null)
 
 
-  //* For responsiveness
+  //* Responsive state
   const [constraints, setContraints] = useState()
   const [commandBarExtended, setCommandBarExtended] = useState(false)
 
@@ -79,53 +79,15 @@ function Scene(props) {
     })
 
     //* Add platform
-
     Composite.add(engine.world, [
-      // Bodies.rectangle(700, 550, 145, 35, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-      //     group: 0,
-      //     category: 1,
-      //     mask: 1
-      //   }, id: ""
-      // }),
       Bodies.rectangle(700, 550, 2000, 130, {
         isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' }, chamfer: { radius: 10 }, collisionFilter: {
           group: 0,
           category: 1,
           mask: 1,
           restitituion: 1,
-          frictionAir: 0.001
         }, id: ""
       }),
-      // Bodies.rectangle(700, 550, 50, 110, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-      //   }, id: ""
-      // }),
-      // Bodies.rectangle(700, 550, 50, 110, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
-      //   }, id: ""
-      // }),
-      // Bodies.rectangle(700, 550, 140, 50, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
-      //     group: 0,
-      //     category: 1,
-      //     mask: 1
-      //   }, id: ""
-      // }),
-      // Bodies.rectangle(700, 550, 90, 50, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
-      //     group: 0,
-      //     category: 1,
-      //     mask: 1
-      //   }, id: ""
-      // }),
-      // Bodies.rectangle(700, 550, 48, 47, {
-      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
-      //     group: 0,
-      //     category: 1,
-      //     mask: 1
-      //   }, id: ""
-      // })
     ]);
 
     //* Implement mouse control
@@ -143,17 +105,15 @@ function Scene(props) {
     Composite.add(engine.world, mouseConstraint);
     setMouseConstraint(mouseConstraint);
     extendCommandBar()
-
-
     Runner.run(engine);
     Render.run(render);
 
-    //* Get window constraints for managing responsiveness
     setContraints(boxRef.current.getBoundingClientRect())
     setScene(render)
 
     window.addEventListener('resize', handleResize)
   }, [])
+
   //* Responsive canvas
   useEffect(() => {
     if (constraints) {
@@ -165,46 +125,23 @@ function Scene(props) {
       scene.canvas.width = width
       scene.canvas.height = height
 
-      //* Responsive static bodies
-      //todo Create responsive static bodies
+      //* Responsive static body
       const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
       Matter.Body.setPosition(floor[0], {
         x: width / 2,
         y: height,
       })
-      // Matter.Body.setPosition(floor[1], {
-      //   x: width / 1.45,
-      //   y: height - 50,
-      // })
-      // Matter.Body.setPosition(floor[2], {
-      //   x: width / 1.2,
-      //   y: height - 60,
-      // })
-      // Matter.Body.setPosition(floor[3], {
-      //   x: width / 1.2,
-      //   y: height - 160,
-      // })
-      // Matter.Body.setPosition(floor[4], {
-      //   x: width / 1.2,
-      //   y: height - 220,
-      // })
-      // Matter.Body.setPosition(floor[5], {
-      //   x: width / 1.2,
-      //   y: height - 240,
-      // })
-      // Matter.Body.setPosition(floor[6], {
-      //   x: width / 1.2,
-      //   y: height - 250,
-      // })
     }
   }, [scene, constraints])
 
   useEffect(() => {
-    console.log(props.isMobile);
     return () => {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+  useEffect(() => {
+    console.log("lollll")
+  }, [props.cardBackShowing])
 
   //*Animation for card following mouse 
   //Todo Move all gsap animations to separate component
@@ -215,12 +152,22 @@ function Scene(props) {
         opacity: 1.0,
         duration: 0.9,
         scale: 1.0,
-        //* Responsive x/y
         x: props.isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 : event.offsetX + 50,
         y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
         ease: "power4.out",
       })
-
+      setTimeout(() => {
+        tl.to(document.querySelector('#floating-card'), {
+          duration: 0.6,
+          rotate: 9,
+        })
+      }, 3500);
+      // setTimeout(() => {
+      //   tl.to(document.querySelector('#floating-card'), {
+      //     duration: 0.6,
+      //     rotate: 360,
+      //   })
+      // },5000);
       // tl.set('#floating-card', {
       //   xPercent: -50,
       //   yPercent: -50
@@ -249,10 +196,9 @@ function Scene(props) {
     });
   }
 
-  //* Animation for hiding enlarged card
+  //* Animations for dismissing / saving large card, 
   //Todo: Improve coords of animations
   useEffect(() => {
-    // event.source.constraint.pointA.x > constraints.width / 2 ? console.log("right side") : console.log("left side")
     if (!props.userSignedIn) {
       props.setShowSignUp(prevState => !prevState)
     }
@@ -266,99 +212,97 @@ function Scene(props) {
         props.setShowLargeCard(false);
         let tl = gsap.timeline()
         if (event.source.constraint.pointA.x > constraints.width / 2) {
-        const saveIcon = document.getElementById("save-icon");
-        tl.from(saveIcon, {
-          perspective: 800,
-          perspectiveOrigin: '50% 50% 0px',
-          duration: 0.3,
-          scale: 0.0,
-          rotate: 360,
-          ease: "elastic.out"
-        })
-        tl.to(saveIcon, {
-          opacity: 1.0,
-          duration: 0.3,
-          scale: 2.0,
-          rotate: 360,
-          ease: "elastic.out"
-        })
-        tl.to(saveIcon, {
-          opacity: 1.0,
-          duration: 0.4,
-          scale: 0,
-          rotate: 360,
-          ease: "elastic.out"
-        })
-        console.log(constraints);
-        tl.to(document.querySelector('#floating-card'), {
-          opacity: 1.0,
-          transformStyle: "preserve-3d",
-          perspective: 200,
-          perspectiveOrigin: '50% 50% 0px',
-          duration: 0.5,
-          scale: 4.0,
-          x: 0,
-          y: 0,
-          ease: "elastic.out"
-        })
-        tl.to(document.querySelector('#floating-card'), {
-          opacity: 1.0,
-          duration: 1.0,
-          scale: 0,
-          x: props.isMobile ? 300 : 355,
-          y: props.isMobile ? 0 : -15,
-          ease: "elastic.out"
-        })
-        tl.set("#floating-card", { fontSize: '100%' });
-        const saveNav = document.getElementById("saved-nav")
-        tl.to(saveNav, {
-          duration: 0.3,
-          color: "#A75248",
-          scale: 2.0,
-          rotate: 30,
-          ease: "power4.out"
-        })
-        tl.to(saveNav, {
-          duration: 0.3,
-          scale: 1,
-          color: "white",
-          rotate: 0,
-          rotate: 0,
-          ease: "power4.in"
-        })
-      }
-      else {
-        tl.to(document.querySelector('#floating-card'), {
-          opacity: 1.0,
-          transformStyle: "preserve-3d",
-          perspective: 200,
-          perspectiveOrigin: '50% 50% 0px',
-          duration: 0.5,
-          scale: 1.0,
-          x: 140,
-          y: 200,
-          ease: "elastic.out"
-        })
-        tl.to(document.querySelector('#floating-card'), {
-          opacity: 1.0,
-          duration: 1.0,
-          scale: 0,
-          x: props.isMobile ? 300 : 355,
-          y: props.isMobile ? 0 : 300,
-          ease: "elastic.out"
-        })
-        tl.to(document.querySelector('#floating-card'), {
-          opacity: 1.0,
-          duration: 1.0,
-          scale: 0,
-          rotate: 360,
-          x: props.isMobile ? 300 : 355,
-          y: props.isMobile ? 0 : -400,
-          ease: "elastic.out"
-        })
-      }
+          const saveIcon = document.getElementById("save-icon");
+          tl.from(saveIcon, {
+            perspective: 800,
+            perspectiveOrigin: '50% 50% 0px',
+            duration: 0.3,
+            scale: 0.0,
+            rotate: 360,
+            ease: "elastic.out"
+          })
+          tl.to(saveIcon, {
+            opacity: 1.0,
+            duration: 0.3,
+            scale: 2.0,
+            rotate: 360,
+            ease: "elastic.out"
+          })
+          tl.to(saveIcon, {
+            opacity: 1.0,
+            duration: 0.4,
+            scale: 0,
+            rotate: 360,
+            ease: "elastic.out"
+          })
+          tl.to(document.querySelector('#floating-card'), {
+            opacity: 1.0,
+            transformStyle: "preserve-3d",
+            perspective: 200,
+            perspectiveOrigin: '50% 50% 0px',
+            duration: 0.5,
+            scale: 4.0,
+            x: 0,
+            y: 0,
+            ease: "elastic.out"
+          })
+          tl.to(document.querySelector('#floating-card'), {
+            opacity: 1.0,
+            duration: 1.0,
+            scale: 0,
+            x: props.isMobile ? 300 : 355,
+            y: props.isMobile ? 0 : -15,
+            ease: "elastic.out"
+          })
+          tl.set("#floating-card", { fontSize: '100%' });
+          const saveNav = document.getElementById("saved-nav")
+          tl.to(saveNav, {
+            duration: 0.3,
+            color: "#A75248",
+            scale: 2.0,
+            rotate: 30,
+            ease: "power4.out"
+          })
+          tl.to(saveNav, {
+            duration: 0.3,
+            scale: 1,
+            color: "white",
+            rotate: 0,
+            rotate: 0,
+            ease: "power4.in"
+          })
+        }
+        else {
+          tl.to(document.querySelector('#floating-card'), {
+            opacity: 1.0,
+            transformStyle: "preserve-3d",
+            perspective: 200,
+            perspectiveOrigin: '50% 50% 0px',
+            duration: 0.5,
+            scale: 1.0,
+            x: 140,
+            y: 200,
+            ease: "elastic.out"
+          })
+          tl.to(document.querySelector('#floating-card'), {
+            opacity: 1.0,
+            duration: 1.0,
+            scale: 0,
+            x: props.isMobile ? 300 : 355,
+            y: props.isMobile ? 0 : 300,
+            ease: "elastic.out"
+          })
+          tl.to(document.querySelector('#floating-card'), {
+            opacity: 1.0,
+            duration: 1.0,
+            scale: 0,
+            rotate: 360,
+            x: props.isMobile ? 300 : 355,
+            y: props.isMobile ? 0 : -400,
+            ease: "elastic.out"
+          })
+        }
       });
-      
     }
   }, [props.showLargeCard])
 
@@ -366,14 +310,12 @@ function Scene(props) {
   //* Check if user presses gravity button
   //? Should this be removed?
   useEffect(() => {
-
     if (mGravity && mEngine !== null) {
       mEngine.world.gravity.y = 0.33;
     }
     else if (mEngine !== null) {
       mEngine.world.gravity.y = -0.11;
     }
-
   }, [mGravity, mEngine])
 
   //* Handles card generation
@@ -424,8 +366,10 @@ function Scene(props) {
   //* Handle adding floating div to mouse movement
   //Todo: Move to mouse constraint component
   useEffect(() => {
+
     //* Add floating div movement event 
     if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
+
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
@@ -436,7 +380,7 @@ function Scene(props) {
           //* Call function to update floating card with card data
           if (matterCardId !== undefined) {
             console.log(matterCardId);
-            props.handleShowingLargeCardFront(matterCardId)
+            props.handleShowingLargeCard(matterCardId)
           }
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
           //Add mouse event to make card enlarge
@@ -481,17 +425,18 @@ function Scene(props) {
       setCommandBarExtended(false);
     }
   }
+
+
   //Todo: Move to separate component
   return (
     <div id="scene" className="flex justify-center relative">
       {props.showFollowingCard === true ?
-        <div id="floating-card"
-          className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
+        <div onClick={() => {props.setCardBackShowing(prevState => !prevState)}}id="floating-card"
+          className="z-50 select-none absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
-          <div >{props.largeCardData}</div>
+          <div > {props.cardBackShowing ? props.largeCardDataBack : props.largeCardDataFront}</div>
         </div>
         : null}
-
       <div id="command-bar" className="bottom-0 fixed left-0 flex h-16 space bg-gray-900 p-3 shadow-md mx-auto rounded-br-md border-gray-300">
         <button onClick={() => { extendCommandBar() }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
         <div>

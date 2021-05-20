@@ -5,7 +5,7 @@ import images from '../img/index'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
-import {handleUpdatingFirestoreCards} from './utils'
+import { handleUpdatingFirestoreCards } from './utils'
 
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
@@ -16,8 +16,9 @@ const floatingCardStyle = {
   backgroundImage: `url(${images.blank_card})`,
   backfaceVisibility: "hidden",
   pointerEvents: "none",
-  object_fit: "contain",
-  backgroundSize:"100%"
+  object_fit: "cover",
+  backgroundSize: "100%",
+  backgroundRepeat: "no-repeat"
 }
 
 function Scene(props) {
@@ -59,9 +60,8 @@ function Scene(props) {
       Composite = Matter.Composite;
 
     let engine = Engine.create({});
-    setEngine(engine);
-    engine.world.gravity.y = 0.001;
 
+    setEngine(engine);
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
@@ -79,51 +79,53 @@ function Scene(props) {
     })
 
     //* Add platform
-    
+
     Composite.add(engine.world, [
-      Bodies.rectangle(700, 550, 145, 35, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+      // Bodies.rectangle(700, 550, 145, 35, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+      //     group: 0,
+      //     category: 1,
+      //     mask: 1
+      //   }, id: ""
+      // }),
+      Bodies.rectangle(700, 550, 2000, 130, {
+        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' }, chamfer: { radius: 10 }, collisionFilter: {
           group: 0,
           category: 1,
-          mask: 1
+          mask: 1,
+          restitituion: 1,
+          frictionAir: 0.001
         }, id: ""
       }),
-      Bodies.rectangle(700, 550, 700, 130, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-          group: 0,
-          category: 1,
-          mask: 1
-        }, id: ""
-      }),
-      Bodies.rectangle(700, 550, 50, 110, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-        }, id: ""
-      }),
-      Bodies.rectangle(700, 550, 50, 110, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-        }, id: ""
-      }),
-      Bodies.rectangle(700, 550, 140, 50, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-          group: 0,
-          category: 1,
-          mask: 1
-        }, id: ""
-      }),
-      Bodies.rectangle(700, 550, 100, 50, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-          group: 0,
-          category: 1,
-          mask: 1
-        }, id: ""
-      }),
-      Bodies.rectangle(700, 550, 55, 47, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
-          group: 0,
-          category: 1,
-          mask: 1
-        }, id: ""
-      })
+      // Bodies.rectangle(700, 550, 50, 110, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 10 },  collisionFilter: {
+      //   }, id: ""
+      // }),
+      // Bodies.rectangle(700, 550, 50, 110, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
+      //   }, id: ""
+      // }),
+      // Bodies.rectangle(700, 550, 140, 50, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
+      //     group: 0,
+      //     category: 1,
+      //     mask: 1
+      //   }, id: ""
+      // }),
+      // Bodies.rectangle(700, 550, 90, 50, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
+      //     group: 0,
+      //     category: 1,
+      //     mask: 1
+      //   }, id: ""
+      // }),
+      // Bodies.rectangle(700, 550, 48, 47, {
+      //   isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' },           chamfer: { radius: 33 },  collisionFilter: {
+      //     group: 0,
+      //     category: 1,
+      //     mask: 1
+      //   }, id: ""
+      // })
     ]);
 
     //* Implement mouse control
@@ -140,11 +142,6 @@ function Scene(props) {
 
     Composite.add(engine.world, mouseConstraint);
     setMouseConstraint(mouseConstraint);
-
-    ////Track user clicks
-    //// Matter.Events.on(mouseConstraint, "mousedown", (event) => {
-    ////   setUserClicks(prevState => prevState + 1)
-    //// });
     extendCommandBar()
 
 
@@ -171,34 +168,34 @@ function Scene(props) {
       //* Responsive static bodies
       //todo Create responsive static bodies
       const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
-        Matter.Body.setPosition(floor[0], {
-          x: width / 2,
-          y: height - 200,
-        })
-        Matter.Body.setPosition(floor[1], {
-          x: width / 2,
-          y: height - 50,
-        })
-        Matter.Body.setPosition(floor[2], {
-          x: width / 2,
-          y: height - 60,
-        })
-        Matter.Body.setPosition(floor[3], {
-          x: width / 2,
-          y: height - 160,
-        })
-        Matter.Body.setPosition(floor[4], {
-          x: width / 2,
-          y: height - 220,
-        })
-        Matter.Body.setPosition(floor[5], {
-          x: width / 2,
-          y: height - 240,
-        })
-        Matter.Body.setPosition(floor[6], {
-          x: width / 2,
-          y: height - 250,
-        })
+      Matter.Body.setPosition(floor[0], {
+        x: width / 2,
+        y: height,
+      })
+      // Matter.Body.setPosition(floor[1], {
+      //   x: width / 1.45,
+      //   y: height - 50,
+      // })
+      // Matter.Body.setPosition(floor[2], {
+      //   x: width / 1.2,
+      //   y: height - 60,
+      // })
+      // Matter.Body.setPosition(floor[3], {
+      //   x: width / 1.2,
+      //   y: height - 160,
+      // })
+      // Matter.Body.setPosition(floor[4], {
+      //   x: width / 1.2,
+      //   y: height - 220,
+      // })
+      // Matter.Body.setPosition(floor[5], {
+      //   x: width / 1.2,
+      //   y: height - 240,
+      // })
+      // Matter.Body.setPosition(floor[6], {
+      //   x: width / 1.2,
+      //   y: height - 250,
+      // })
     }
   }, [scene, constraints])
 
@@ -255,16 +252,20 @@ function Scene(props) {
   //* Animation for hiding enlarged card
   //Todo: Improve coords of animations
   useEffect(() => {
+    // event.source.constraint.pointA.x > constraints.width / 2 ? console.log("right side") : console.log("left side")
+    if (!props.userSignedIn) {
+      props.setShowSignUp(prevState => !prevState)
+    }
     if (mMouseConstraint !== null) {
       Matter.Events.off(mMouseConstraint, "mouseup")
     }
-    if (mMouseConstraint != null && props.showLargeCard) {
+    if (mMouseConstraint != null && props.showLargeCard && props.userSignedIn) {
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         handleUpdatingFirestoreCards(matterCard)
-
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
         let tl = gsap.timeline()
+        if (event.source.constraint.pointA.x > constraints.width / 2) {
         const saveIcon = document.getElementById("save-icon");
         tl.from(saveIcon, {
           perspective: 800,
@@ -288,6 +289,7 @@ function Scene(props) {
           rotate: 360,
           ease: "elastic.out"
         })
+        console.log(constraints);
         tl.to(document.querySelector('#floating-card'), {
           opacity: 1.0,
           transformStyle: "preserve-3d",
@@ -295,8 +297,8 @@ function Scene(props) {
           perspectiveOrigin: '50% 50% 0px',
           duration: 0.5,
           scale: 4.0,
-          x: 140,
-          y: 200,
+          x: 0,
+          y: 0,
           ease: "elastic.out"
         })
         tl.to(document.querySelector('#floating-card'), {
@@ -324,92 +326,124 @@ function Scene(props) {
           rotate: 0,
           ease: "power4.in"
         })
+      }
+      else {
+        tl.to(document.querySelector('#floating-card'), {
+          opacity: 1.0,
+          transformStyle: "preserve-3d",
+          perspective: 200,
+          perspectiveOrigin: '50% 50% 0px',
+          duration: 0.5,
+          scale: 1.0,
+          x: 140,
+          y: 200,
+          ease: "elastic.out"
+        })
+        tl.to(document.querySelector('#floating-card'), {
+          opacity: 1.0,
+          duration: 1.0,
+          scale: 0,
+          x: props.isMobile ? 300 : 355,
+          y: props.isMobile ? 0 : 300,
+          ease: "elastic.out"
+        })
+        tl.to(document.querySelector('#floating-card'), {
+          opacity: 1.0,
+          duration: 1.0,
+          scale: 0,
+          rotate: 360,
+          x: props.isMobile ? 300 : 355,
+          y: props.isMobile ? 0 : -400,
+          ease: "elastic.out"
+        })
+      }
       });
+      
     }
   }, [props.showLargeCard])
 
   //Animation for handling bottom command bar
-
   //* Check if user presses gravity button
   //? Should this be removed?
   useEffect(() => {
+
     if (mGravity && mEngine !== null) {
       mEngine.world.gravity.y = 0.33;
     }
     else if (mEngine !== null) {
       mEngine.world.gravity.y = -0.11;
     }
+
   }, [mGravity, mEngine])
 
   //* Handles card generation
   //Todo: Move to card generation component
 
   useEffect(() => {
+
+    const generateMatterCard = () => {
+      let newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
+        isStatic: false,
+        angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
+        chamfer: { radius: 1 },
+        density: 0.2,
+        force: { x: 2, y: 3 },
+        restitituion: 1,
+        frictionAir: 0.001,
+        collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        },
+        render: {
+          fillStyle: '#374151',
+          strokeStyle: '#968786',
+          chamfer: { radius: 9 },
+          lineWidth: 2,
+          sprite: {
+            texture: blank_card_small,
+          }
+        },
+        id: props.currentDeck[props.currentDeck.length - 1].id
+      })]);
+
+    }
     for (let i = 0; i < props.currentDeck.length; i++) {
       //* Random card generation at slightly different times visual effect
       let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10
-      let randomImage = Math.floor(Math.random() * (56)) + 1;
 
       setTimeout(function () {
-        var newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
-          isStatic: false,
-          angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
-          chamfer: { radius: 1 },
-          density: 0.2,
-          force: { x: 2, y: 3 },
-          collisionFilter: {
-            group: 0,
-            category: 1,
-            mask: 1
-          },
-          render: {
-            fillStyle: '#374151',
-            strokeStyle: '#968786',
-            chamfer: { radius: 9 },
-            lineWidth: 2,
-            sprite: {
-              texture: blank_card_small,
-            }
-          },
-          id: props.currentDeck[props.currentDeck.length - 1].id
-        })]);
+        generateMatterCard();
+
       }, randomTime);
-      props.currentDeck.pop();
+      props.currentDeck.pop()
+      // props.setCurrentDeck(prevDeck => prevDeck.filter((element, index) => index < prevDeck.length - 1))
     }
   }, [props.currentDeck])
 
   //* Handle adding floating div to mouse movement
   //Todo: Move to mouse constraint component
   useEffect(() => {
-    ////console.log(props.cardArray);
     //* Add floating div movement event 
     if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
-        console.log(event.source.constraint.pointA.x);
-        event.source.constraint.pointA.x > constraints.width / 2 ? console.log("right side") : console.log("left side")
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
-        // event.width > event.width/2 ? console.log("right side)")
         if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
           setMatterCardId(matterCardId)
-          //// console.log(matterCardId)
-          //// console.log(props.cardArray);
+
           //* Call function to update floating card with card data
           if (matterCardId !== undefined) {
             console.log(matterCardId);
             props.handleShowingLargeCardFront(matterCardId)
           }
-          // //Add listener to make floating card follow mouse
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
-          //// document.getElementById('floating-card').addEventListener(handleClick)
           //Add mouse event to make card enlarge
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease)
         }
       });
     }
-    //// console.log(props.currentDeck);
-    //// console.log(props.cardArray)
     //Todo: Necessary dependencies?    
   }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
 
@@ -428,9 +462,6 @@ function Scene(props) {
 
   }, [props.CardArray])
   //Todo: Implement
-  const handleClick = () => {
-    console.log("clicked on div")
-  }
 
   //Todo: Move to CommandBar.js component
   const extendCommandBar = (extended) => {
@@ -454,7 +485,7 @@ function Scene(props) {
   return (
     <div id="scene" className="flex justify-center relative">
       {props.showFollowingCard === true ?
-        <div id="floating-card" onClick={handleClick}
+        <div id="floating-card"
           className="z-50 absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
           <div >{props.largeCardData}</div>

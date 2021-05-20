@@ -78,9 +78,21 @@ export const handleSignUp = async newUser => {
     });
     console.log(user);
 }
-
+//* Handles sign in
+export const handleSignIn = (event) => {
+  console.log(event);
+firebase.auth().signInWithEmailAndPassword(event.target.email.value, event.target.password.value)
+  .then((userCredential) => {
+    var user = userCredential.user;
+  })
+  .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    console.log(errorMessage);
+  });
+}
 //* Handles sign out
-export const handleSignOut = async user => {
+export const handleSignOut = async => {
   firebase.auth().signOut().then(() => {
     console.log("signout successful")
     // Sign-out successful.

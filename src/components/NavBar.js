@@ -2,6 +2,7 @@ import React from 'react'
 import logo from '../img/logo.png'
 import { gsap } from "gsap";
 import { useEffect } from 'react/cjs/react.development';
+import { handleSignOut } from './utils';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -61,8 +62,20 @@ export default function NavBar(props) {
                 {navigation.map((item) => (
                   <a
                     onClick={() => {
-                      props.setShowAddCard(prevState => !prevState) 
-                      item.current = !item.current}}
+                      if (item.id === "new-nav") {
+                        props.setShowAddCard(prevState => !prevState)
+                      } else if (item.id === "sign-out-nav") {
+                        handleSignOut()
+                        console.log("test")
+                        props.setUserSignedIn(prevState => !prevState)
+                      } else if (item.id === "sign-up-nav") {
+                        props.setShowSignUp(prevState => !prevState)
+                      }
+                      else if (item.id === "sign-in-nav") {
+                        props.setShowSignIn(prevState => !prevState)
+                      }
+                      item.current = !item.current
+                      }}
                     id={item.id}
                     key={item.id}
                     href={item.href}

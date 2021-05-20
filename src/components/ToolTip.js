@@ -13,9 +13,9 @@ const ToolTip = (props) => (
         <h1 className=" dark:text-gray-100 text-gray-800 font-bold text-lg text-left pl-3">Welcome to shareflashcards</h1>
       </div>
       <p className="text-md pt-6 text-left font-normal  dark:text-gray-100 text-gray-600"> 
-      <li> <span className="text-green-800">Chill out</span>, throw on some lo-fi, and check out flash cards from users globally </li> 
+      <li> <span className="text-green-800">Chill out</span> and check out flash cards from users globally </li> 
       <li> Tap a card to see pop up it's contents</li> 
-      <li> Cards can be saved by tapping their pop up</li>
+      <li> Cards can be saved by tapping the right side of the screen, or left side to discard.</li>
       </p>
       <div className="flex items-center justify-between pt-6">
         <button onClick={() => props.setShowToolTip(false)} className="py-3.5 w-full text-white focus:outline-none hover:opacity-90 text-sm font-semibold border rounded border-indigo-700 bg-indigo-700 leading-3">Okay!</button>

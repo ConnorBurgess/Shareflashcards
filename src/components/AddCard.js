@@ -14,7 +14,8 @@ const AddCard = (props) => {
 }, []);
   return (
     <>
-      <form onSubmit={() => { 
+      <form onSubmit={(event) => { 
+        event.preventDefault()
         props.addCard()
         props.setShowAddCard(false)}} >
         <div className="flex items-center justify-center rounded-md w-full">
@@ -40,7 +41,7 @@ const AddCard = (props) => {
                     placeholder={tag}
                     onChange={e => setTitleCount(
                       10 - e.target.value.length)}
-                    maxlength="10"
+                    maxLength="10"
                     required
                   />
                 </p>
@@ -71,8 +72,8 @@ const AddCard = (props) => {
                     name="front"
                     onChange={e => setFrontCount(
                       200 - e.target.value.length)}
-                    maxlength="200"
-                    minlength="5"
+                    maxLength="200"
+                    minLength="5"
                     rows="4"
                     cols="25"
                     placeholder="Share"
@@ -98,8 +99,8 @@ const AddCard = (props) => {
                     name="back"
                     onChange={e => setBackCount(
                       400 - e.target.value.length)}
-                    maxlength="300"
-                    minlength="5"
+                    maxLength="300"
+                    minLength="5"
                     rows="4"
                     cols="25"
                     placeholder="Learn"

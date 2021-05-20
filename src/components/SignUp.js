@@ -10,7 +10,7 @@ const SignUp = (props) => {
   return (
     <div className="grid place-items-center overflow-x-hidden">
       <div id="draggable" className="p-8 bg-white mx-auto border-t-8 border-b-8 shadow-sm border-gray-700">
-        <h1 className="text-xl font-semibold">Hello there <br /><button className="text-red-500 transform hover:scale-105 focus:outline-none select-none"
+        <h1 className="text-xl font-semibold">Hello there <br /><button className="text-green-800 transform hover:scale-105 focus:outline-none select-none"
           onClick={() => props.setUserName(props.generateRandomName())}>
           {props.userName}</button><span className="ml-1">👋</span>, <br /> <span className="font-normal">Provide an email and password to get exploring</span></h1>
         <form className="mt-6 w-max" onSubmit={(event) => { 

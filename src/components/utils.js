@@ -49,7 +49,7 @@ export const handleGetCards = async () => {
 export const generateDeck = (cardArrayPassed) => {
   try {
     const tempDeck = cardArrayPassed.map(x => { return x }).sort();
-    console.log(tempDeck);
+    // console.log(tempDeck);
     return tempDeck;
   } catch (error) {
     console.log(error);
@@ -78,6 +78,7 @@ export const handleSignUp = async newUser => {
     });
     console.log(user);
 }
+
 //* Handles sign in
 export const handleSignIn = (event) => {
   console.log(event);
@@ -91,6 +92,7 @@ firebase.auth().signInWithEmailAndPassword(event.target.email.value, event.targe
     console.log(errorMessage);
   });
 }
+
 //* Handles sign out
 export const handleSignOut = async => {
   firebase.auth().signOut().then(() => {

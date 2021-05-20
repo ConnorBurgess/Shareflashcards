@@ -8,13 +8,13 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 let navigation = [
-  { name: 'Explore', href: '#', current: true, id:"explore-nav" },
-  { name: 'New Card', href: '#', current: false, id:"new-nav" },
+  { name: 'Explore', href: '#', current: true, id: "explore-nav" },
+  { name: 'New Card', href: '#', current: false, id: "new-nav" },
   { name: 'Saved', href: '#', current: false, id: "saved-nav" },
   { name: 'Profile', href: '#', current: false, id: "profile-nav" },
-  { name: 'Sign up', current: false, id:"sign-up-nav"},
-  { name: 'Sign in', current: false, id:"sign-in-nav"},
-  { name: 'Sign out', current: false, id:"sign-out-nav"},
+  { name: 'Sign up', current: false, id: "sign-up-nav" },
+  { name: 'Sign in', current: false, id: "sign-in-nav" },
+  { name: 'Sign out', current: false, id: "sign-out-nav" },
 
 
 ]
@@ -66,7 +66,6 @@ export default function NavBar(props) {
                         props.setShowAddCard(prevState => !prevState)
                       } else if (item.id === "sign-out-nav") {
                         handleSignOut()
-                        console.log("test")
                         props.setUserSignedIn(prevState => !prevState)
                       } else if (item.id === "sign-up-nav") {
                         props.setShowSignUp(prevState => !prevState)
@@ -74,8 +73,15 @@ export default function NavBar(props) {
                       else if (item.id === "sign-in-nav") {
                         props.setShowSignIn(prevState => !prevState)
                       }
+                      else if (item.id === "saved-nav") {
+                        let anki = document.createElement('anki');
+                        anki.href = "data:application/octet-stream," + encodeURIComponent("My DATA");
+                        anki.download = 'abc.txt';
+                        anki.click();
+                        
+                      }
                       item.current = !item.current
-                      }}
+                    }}
                     id={item.id}
                     key={item.id}
                     href={item.href}

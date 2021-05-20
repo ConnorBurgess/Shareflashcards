@@ -38,7 +38,7 @@ function Scene(props) {
   //* Responsive state
   const [constraints, setContraints] = useState()
   const [commandBarExtended, setCommandBarExtended] = useState(false)
-
+  const [mRender, setRender] = useState(false);
   const [scene, setScene] = useState()
   const handleResize = () => {
     setContraints(boxRef.current.getBoundingClientRect())
@@ -72,12 +72,12 @@ function Scene(props) {
         showIds: false,
         width: window.innerWidth,
         height: window.innerHeight,
-        background: images.background,
+        background: props.backgroundTheme ? images.background : images.background2,
         wireframes: false,
 
       },
     })
-
+      setRender(render);
     //* Add platform
     Composite.add(engine.world, [
       Bodies.rectangle(700, 550, 2000, 130, {
@@ -140,11 +140,10 @@ function Scene(props) {
     }
   }, [])
   useEffect(() => {
-    console.log("lollll")
   }, [props.cardBackShowing])
 
   //*Animation for card following mouse 
-  //Todo Move all gsap animations to separate component
+  //Todo: Move all gsap animations to separate component
   function onMouseMove(event) {
     if (props.showFollowingCard) {
       var tl = gsap.timeline()
@@ -179,6 +178,7 @@ function Scene(props) {
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
       props.setShowLargeCard(true);
+      document.getElementById("floating-card").classList.remove("pointer-events-none")
       document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove);
       document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease);
       let tl = gsap.timeline()
@@ -191,12 +191,21 @@ function Scene(props) {
         y: props.isMobile ? 200 : event.offsetY,
         ease: "elastic.out"
       })
+      tl.to(document.querySelector('#floating-card'), {
+        duration: 0.9,
+        ease: "elastic.in",
+        x: props.isMobile ? 140 : constraints.right/2,
+        y: props.isMobile ? 200 : constraints.height/3,
+        ease: "elastic.out"
+      })
+
       tl.set("#floating-card", { fontSize: '25%' });
       tl.delay(0.3)
     });
+    
   }
 
-  //* Animations for dismissing / saving large card, 
+  //* Actions for dismissing / saving large card, 
   //Todo: Improve coords of animations
   useEffect(() => {
     if (!props.userSignedIn) {
@@ -206,7 +215,9 @@ function Scene(props) {
       Matter.Events.off(mMouseConstraint, "mouseup")
     }
     if (mMouseConstraint != null && props.showLargeCard && props.userSignedIn) {
+      props.setCardBackShowing(false);
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
+        document.getElementById("floating-card").classList.add("pointer-events-none")
         handleUpdatingFirestoreCards(matterCard)
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
@@ -284,6 +295,7 @@ function Scene(props) {
             y: 200,
             ease: "elastic.out"
           })
+          tl.set("#floating-card", { fontSize: '100%' });
           tl.to(document.querySelector('#floating-card'), {
             opacity: 1.0,
             duration: 1.0,
@@ -314,7 +326,7 @@ function Scene(props) {
       mEngine.world.gravity.y = 0.33;
     }
     else if (mEngine !== null) {
-      mEngine.world.gravity.y = -0.11;
+      mEngine.world.gravity.y = -0.2;
     }
   }, [mGravity, mEngine])
 
@@ -379,7 +391,6 @@ function Scene(props) {
 
           //* Call function to update floating card with card data
           if (matterCardId !== undefined) {
-            console.log(matterCardId);
             props.handleShowingLargeCard(matterCardId)
           }
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
@@ -426,13 +437,16 @@ function Scene(props) {
     }
   }
 
+  useEffect(() => {
+  }, [props.backgroundTheme])
+
 
   //Todo: Move to separate component
   return (
     <div id="scene" className="flex justify-center relative">
       {props.showFollowingCard === true ?
         <div onClick={() => {props.setCardBackShowing(prevState => !prevState)}}id="floating-card"
-          className="z-50 select-none absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
+          className="z-50 pointer-events-none select-none absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
           <div > {props.cardBackShowing ? props.largeCardDataBack : props.largeCardDataFront}</div>
         </div>
@@ -443,11 +457,12 @@ function Scene(props) {
           <div id="buttons-popup" className="fixed opacity-0 h-16 bottom-0 inline-block w-full bg-gray-900">
             <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10 " onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
             <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
+            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setBackgroundTheme(prevState => !prevState)}>{props.backgroundTheme ? "Day" : "Night"}</button>
             <button className="text-red-400 m-2 justify-end outline-none select-none animate-pulse text-bold transform hover:scale-105 z-10" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
           </div>
         </div>
       </div>
-      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className=" fixed p-3 border-r-2 select-none border-gray-700 rounded-r-md h-24 w-4/12 left-0 top-36 sm:w-2/12 sm:h-3/6 bg-gray-700 shadow-lg"><div className="z-50 border-red-400  text-white"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>
+      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className=" fixed p-3 border-r-2 select-none border-gray-700 rounded-r-md h-24 w-4/12 left-0 top-36 sm:w-2/12 sm:h-3/6 bg-gray-700 shadow-lg md:p-5 text-green-800 sm:text-3xl"><div className="z-50 border-red-400  text-white"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>
       <div
         ref={boxRef}
         style={{

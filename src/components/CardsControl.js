@@ -39,7 +39,7 @@ function CardsControl() {
   //* Button to toggle card generation on/off
   //Todo: Implement functionality
   const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
-
+  const [backgroundTheme, setBackgroundTheme] = useState(false);
   //* Boost for more cards
   //Todo: Fix, currently generates using a function with setInterval which is nasty
   const [generateMoreCards, setGenerateMoreCards] = useState(1);
@@ -94,7 +94,7 @@ function CardsControl() {
   useEffect(() => {
     var tl = gsap.timeline()
     const veil = document.getElementById("veil");
-    if (showAddCard || showToolTip || showSignUp || showSignIn) {
+    if (showAddCard || showToolTip || showSignUp || showSignIn || showLargeCard) {
       tl.to(veil, {
         duration: 2.0,
         autoAlpha: 0.44
@@ -106,7 +106,7 @@ function CardsControl() {
         autoAlpha: 0
       })
     }
-  }, [showToolTip, showAddCard, showSignUp, showSignIn]);
+  }, [showToolTip, showAddCard, showSignUp, showSignIn, showLargeCard]);
 
   //* Components draggable upon component mount
   useEffect(() => {
@@ -162,7 +162,6 @@ function CardsControl() {
     setCardArray(cardArray.sort(() => Math.random() - 0.5))
     if (cardArray.length > 7) {
       const trimmedCollection = generateDeck(cardArray);
-      console.log(trimmedCollection);
       setCurrentDeck(trimmedCollection);
       let randomTime = Math.floor(Math.random() * (30000 - 7000 + 1)) + 7000
       setTimeout(
@@ -183,7 +182,7 @@ function CardsControl() {
             userSignedIn={userSignedIn}
             setUserSignedIn={setUserSignedIn}
             setShowSignUp={setShowSignUp}
-            setShownSignIn={setShowSignIn}
+            setShowSignIn={setShowSignIn}
           />
         </div>
         <div className="absolute z-50 h-max w-max">
@@ -206,7 +205,7 @@ function CardsControl() {
               setShowAddCard={setShowAddCard}
             />
             : null} </div>
-        <div id="veil" className=" opacity-40 h-full w-full z-30 bg-gray-800 absolute"></div>
+        <div id="veil" className=" pointer-events-none opacity-40 h-full w-full z-30 bg-gray-800 absolute"></div>
         <div ref={draggableSignUp} className="absolute m-20 z-50 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
           {showSignUp ?
             <SignUp
@@ -220,6 +219,8 @@ function CardsControl() {
             : null}</div>
         <div className="z-0">
           <Scene
+            setBackgroundTheme={setBackgroundTheme}
+            backgroundTheme={backgroundTheme}
             userSignedIn={userSignedIn}
             isMobile={isMobile}
             setShowSignUp={setShowSignUp}

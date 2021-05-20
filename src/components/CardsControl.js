@@ -5,22 +5,22 @@ import ToolTip from './ToolTip';
 import AddCard from './AddCard';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
-import firebase, { firestore, auth } from '../firebase';
+import firebase from '../firebase';
 import react, { useState, useEffect, useRef } from 'react';
-import { generateRandomName, handleAddCard, handleKeyPress, handleGetCards, generateDeck, handleSignUp, deviceDetect } from './utils';
+import {handleAddCard, handleGetCards, generateDeck, handleSignUp } from '../lib/firebase';
+import {generateRandomName, deviceDetect} from '../lib/utils'
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
 
 function CardsControl() {
 
-  //* Handle display of different  components
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
 
-  //* CardArray all DB cards and currentdeck is intended to hold a smaller subset deck
+  //* CardArray all DB cards and currentdeck is intended to hold a smaller sub-deck
   //Todo: CurrentDeck is just a sorted cardArray in current implementation
   const [cardArray, setCardArray] = useState([{}]);
   const [currentDeck, setCurrentDeck] = useState([]);
@@ -39,7 +39,7 @@ function CardsControl() {
   //* Button to toggle card generation on/off
   //Todo: Implement functionality
   const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
-  const [backgroundTheme, setBackgroundTheme] = useState(false);
+
   //* Boost for more cards
   //Todo: Fix, currently generates using a function with setInterval which is nasty
   const [generateMoreCards, setGenerateMoreCards] = useState(1);
@@ -63,27 +63,27 @@ function CardsControl() {
     const clickedCard = cardArray.find(e => e.id === id);
     if (clickedCard != undefined) {
       setLargeCardDataFront(
-        <><div className="relative justify-items-center ml-4 mr-4 my-4 rounded-md overflow-hidden">
+        <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
           <div className="text-center">
-            <h1 className="font-bold text-sm text-green-800">{clickedCard.data.title} </h1>
+            <h1 className="text-sm font-bold text-green-800">{clickedCard.data.title} </h1>
             <span> 05/17/21</span>
           </div>
-          <h2 className="text-center italic text-bold sm:mb-2 mr-2">Ruthless Butterscotch</h2>
+          <h2 className="mb-1 mr-2 italic text-center text-bold sm:mb-1">Ruthless Butterscotch</h2>
           <br />
-          <div id="card-front" className=" ml-2 mr-1 flex mb-7">
+          <div id="card-front" className="flex ml-2 mr-1 lg:text-xs mb-7">
             {clickedCard.data.front}
           </div>
         </div>
         </>)
       setLargeCardDataBack(
-        <><div className="relative justify-items-center ml-4 mr-4 my-4 rounded-md overflow-hidden">
+        <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
           <div className="text-center">
-            <h1 className="font-bold text-sm text-green-800">{clickedCard.data.title} </h1>
+            <h1 className="text-sm font-bold text-green-800">{clickedCard.data.title} </h1>
             <span> 05/17/21</span>
           </div>
-          <h2 className="text-center italic text-bold sm:mb-2 mr-2">Ruthless Butterscotch</h2>
+          <h2 className="mb-1 mr-2 italic text-center text-bold sm:mb-1">Ruthless Butterscotch</h2>
           <br />
-          <div id="card-front" className=" ml-2 mr-1 flex mb-7">
+          <div id="card-back" className="flex ml-2 mr-1 lg:text-xs mb-7">
             {clickedCard.data.back}
           </div>
         </div>
@@ -118,13 +118,12 @@ function CardsControl() {
       bounds: appBox.current,
       throwProps: true,
       dragClickables: false
-
     });
     Draggable.create(draggableSignUp.current, {
       bounds: appBox.current,
       throwProps: true,
       dragClickables: false
-    });
+    },[]);
 
     //* Fetch firestore data on mount
     const fetchData = async () => {
@@ -140,7 +139,6 @@ function CardsControl() {
     }
     fetchData();
     setIsMobile(deviceDetect());
-    //* Verify user is signed in
   }, []);
 
   useEffect(() => {
@@ -175,7 +173,7 @@ function CardsControl() {
   return (
     <>
       <div ref={appBox}>
-        <div className="z-40 absolute w-full">
+        <div className="absolute z-40 w-full">
           <NavBar
             isMobile={isMobile}
             setShowAddCard={setShowAddCard}
@@ -198,15 +196,15 @@ function CardsControl() {
           {showToolTip ?
             <ToolTip
               setShowToolTip={setShowToolTip} /> : null}</div>
-        <div ref={draggableAddCard} className="z-40 absolute md:top-9 left-4 md:left-1/4 drag sm:w-1/2 w-3/4 sm:top-0 top-6">
+        <div ref={draggableAddCard} className="absolute z-40 w-3/4 md:top-9 left-4 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6">
           {showAddCard ?
             <AddCard
               addCard={handleAddCard}
               setShowAddCard={setShowAddCard}
             />
             : null} </div>
-        <div id="veil" className=" pointer-events-none opacity-40 h-full w-full z-30 bg-gray-800 absolute"></div>
-        <div ref={draggableSignUp} className="absolute m-20 z-50 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
+        <div id="veil" className="absolute z-30 w-full h-full bg-gray-800 pointer-events-none opacity-40"></div>
+        <div ref={draggableSignUp} className="absolute z-50 m-20 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
           {showSignUp ?
             <SignUp
               handleSignUp={handleSignUp}
@@ -219,28 +217,23 @@ function CardsControl() {
             : null}</div>
         <div className="z-0">
           <Scene
-            setBackgroundTheme={setBackgroundTheme}
-            backgroundTheme={backgroundTheme}
-            userSignedIn={userSignedIn}
             isMobile={isMobile}
+            userSignedIn={userSignedIn}
             setShowSignUp={setShowSignUp}
-            cardArray={cardArray}
-            handleShowingLargeCard={handleShowingLargeCard}
-            //Determines whether actual card is visible after clicking or not
+            setShowLargeCard={setShowLargeCard}
+            setShowLargeCardBack
+            setCardBackShowing={setCardBackShowing}
+            showLargeCard={showLargeCard}
             showFollowingCard={showFollowingCard}
             setFollowingCard={setFollowingCard}
-            showLargeCard={showLargeCard}
-            setShowLargeCard={setShowLargeCard}
-            setCardBackShowing={setCardBackShowing}
+            cardArray={cardArray}
+            handleShowingLargeCard={handleShowingLargeCard}
             cardBackShowing={cardBackShowing}
-            setShowLargeCardBack
             currentDeck={currentDeck}
             setCurrentDeck={setCurrentDeck}
             getCards={handleGetCards}
             generateDeck={generateDeck}
-            //Press button to generate more cards
             setGenerateMoreCards={setGenerateMoreCards}
-            //Turn card generation on or off
             setCurrentlyGeneratingCards={setCurrentlyGeneratingCards}
             largeCardDataFront={largeCardDataFront}
             largeCardDataBack={largeCardDataBack} />

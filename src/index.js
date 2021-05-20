@@ -5,8 +5,7 @@ import App from './components/App';
 import NavBar from './components/NavBar';
 import ToolTip from './components/ToolTip';
 import '@fontsource/roboto';
-
-// import firebase from './firebase'
+import './fonts/morris-roman_black.ttf';
 
 ReactDOM.render(
   <>

@@ -1,6 +1,5 @@
-import { PreviousMap } from "postcss";
-import PropTypes from "prop-types";
-import react, { useState, useEffect } from 'react';
+import{ useEffect } from 'react';
+
 const SignUp = (props) => {
   //Generate random name on component mount
   useEffect(() => {
@@ -8,9 +7,9 @@ const SignUp = (props) => {
   }, [])
 
   return (
-    <div className="grid place-items-center overflow-x-hidden">
-      <div id="draggable" className="p-8 bg-white mx-auto border-t-8 border-b-8 shadow-sm border-gray-700">
-        <h1 className="text-xl font-semibold">Hello there <br /><button className="text-green-800 transform hover:scale-105 focus:outline-none select-none"
+    <div className="grid overflow-x-hidden place-items-center">
+      <div id="draggable" className="p-8 mx-auto bg-white border-t-8 border-b-8 border-gray-700 shadow-sm">
+        <h1 className="text-xl font-semibold">Hello there <br /><button className="text-green-800 transform select-none hover:scale-105 focus:outline-none"
           onClick={() => props.setUserName(props.generateRandomName())}>
           {props.userName}</button><span className="ml-1">👋</span>, <br /> <span className="font-normal">Provide an email and password to get exploring</span></h1>
         <form className="mt-6 w-max" onSubmit={(event) => { 
@@ -26,7 +25,7 @@ const SignUp = (props) => {
           <label htmlFor="password-confirm" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">Confirm password</label>
           <input id="password-confirm" type="password" name="password-confirm" placeholder="********" autoComplete="new-password" className="block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" required />
           <input id="userName" type="userName" name="userName" hidden={true} value={props.userName} />
-          <button type="submit" className="animate-pulse w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg focus:outline-none hover:bg-gray-900 hover:shadow-none">
+          <button type="submit" className="w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg animate-pulse focus:outline-none hover:bg-gray-900 hover:shadow-none">
             Join
       </button>
           <button type="click" onClick={() => {

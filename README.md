@@ -1,7 +1,7 @@
-# Cards
+# Shareflashcards
 #### Created By: Connor Burgess 
 * * *
-* Heavily WIP, very buggy / code needs to be refactored and separated to components 5.18.21
+* Heavily WIP, very buggy / code needs to be refactored and separated to components 5.20.21
 ## Description  
 Responsive web application allowing users to contribute flash cards to community and send cards to friends. Uses Matter.js physics engine to allow users to explore database visually and build sets off discovered cards. Site built using React and styled with Tailwind. Backend NOSQL database managed through Firebase.
 * * *
@@ -24,6 +24,7 @@ Responsive web application allowing users to contribute flash cards to community
 * npm
 * BrowserFS
 * Better Comments
+* Adobe Stock Assets
 * Create React App
 
 * * *

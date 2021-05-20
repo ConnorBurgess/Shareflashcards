@@ -1,8 +1,6 @@
 import React from 'react'
 import logo from '../img/logo.png'
-import { gsap } from "gsap";
-import { useEffect } from 'react/cjs/react.development';
-import { handleSignOut } from './utils';
+import { handleSignOut } from '../lib/firebase';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -15,27 +13,7 @@ let navigation = [
   { name: 'Sign up', current: false, id: "sign-up-nav" },
   { name: 'Sign in', current: false, id: "sign-in-nav" },
   { name: 'Sign out', current: false, id: "sign-out-nav" },
-
-
 ]
-// const extendNavBar = (extended) => {
-//   const commandBarButtons = document.getElementById("buttons-popup");
-//   let tl = gsap.timeline()
-//   if (!commandBarExtended || extended) {
-//     tl.from(commandBarButtons, { autoAlpha: 0, xPercent: -75, yPercent: 100 })
-//     tl.to(commandBarButtons, { autoAlpha: 50, xPercent: 0, duration: 0.3, ease: "Power4.in" })
-//     tl.to(commandBarButtons, { autoAlpha: 100, yPercent: -100, duration: 0.6, ease: "Power4.out" })
-//     tl.to(commandBarButtons, { yPercent: 0, duration: 0.6, ease: "bounce" })
-//     setCommandBarExtended(true);
-
-//   } else if (commandBarExtended || extended) {
-//     tl.from(commandBarButtons, { xPercent: 0 })
-//     tl.to(commandBarButtons, { yPercent: 100, duration: 0.6, ease: "Power4.in" })
-//     tl.to(commandBarButtons, { autoAlpha: 0, xPercent: -100, duration: 1.3, ease: "power4.out" })
-//     setCommandBarExtended(false);
-//   }
-// }
-
 
 export default function NavBar(props) {
 
@@ -78,7 +56,6 @@ export default function NavBar(props) {
                         anki.href = "data:application/octet-stream," + encodeURIComponent("My DATA");
                         anki.download = 'abc.txt';
                         anki.click();
-                        
                       }
                       item.current = !item.current
                     }}
@@ -99,7 +76,6 @@ export default function NavBar(props) {
           </div>
           <div className="absolute top-20 right-10">
             <svg id="save-icon" className="opacity-0" xmlns="http://www.w3.org/2000/svg" width="34" height="34" style={{ fill: "rgba(210, 26, 26, 1)" }} viewBox="0 0 24 24"><path fill="none" d="M9 14H15V19H9zM11 5H13V7H11z"></path><path fill="none" d="M7,14c0-1.103,0.897-2,2-2h6c1.103,0,2,0.897,2,2v5h2.001L19,8.414L15.586,5H15v4h-1h-1h-2H9H7V5H5v14h2V14z"></path><path d="M5,21h14c1.103,0,2-0.897,2-2V8c0-0.265-0.105-0.52-0.293-0.707l-4-4C16.52,3.105,16.266,3,16,3H5C3.897,3,3,3.897,3,5v14 C3,20.103,3.897,21,5,21z M15,19H9v-5h6V19z M13,7h-2V5h2V7z M5,5h2v4h2h2h2h1h1V5h0.586L19,8.414L19.001,19H17v-5 c0-1.103-0.897-2-2-2H9c-1.103,0-2,0.897-2,2v5H5V5z"></path></svg>
-
           </div>
         </div>
       </nav>

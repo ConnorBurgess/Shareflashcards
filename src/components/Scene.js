@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
 import popup from '../img/popup.jpg'
-import images from '../img/index'
+import background from '../img/background_alt.jpg'
+import background_alt from '../img/background_alt.jpg'
+import blank_card from '../img/blank_card.png'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
-import { handleUpdatingFirestoreCards } from './utils'
+import { handleUpdatingFirestoreCards } from '../lib/firebase'
 
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
@@ -13,7 +15,7 @@ import { handleUpdatingFirestoreCards } from './utils'
 //* Holds style for pop up div when hovering over a Matter.js card
 //? Is this style necessary?
 const floatingCardStyle = {
-  backgroundImage: `url(${images.blank_card})`,
+  backgroundImage: `url(${blank_card})`,
   backfaceVisibility: "hidden",
   object_fit: "cover",
   overflow: "hidden",
@@ -72,12 +74,12 @@ function Scene(props) {
         showIds: false,
         width: window.innerWidth,
         height: window.innerHeight,
-        background: props.backgroundTheme ? images.background : images.background2,
+        background: {background_alt},
         wireframes: false,
 
       },
     })
-      setRender(render);
+    setRender(render);
     //* Add platform
     Composite.add(engine.world, [
       Bodies.rectangle(700, 550, 2000, 130, {
@@ -116,6 +118,7 @@ function Scene(props) {
 
   //* Responsive canvas
   useEffect(() => {
+
     if (constraints) {
       let { width, height } = constraints
       scene.bounds.max.x = width
@@ -139,6 +142,7 @@ function Scene(props) {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+
   useEffect(() => {
   }, [props.cardBackShowing])
 
@@ -155,28 +159,23 @@ function Scene(props) {
         y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
         ease: "power4.out",
       })
+
       setTimeout(() => {
         tl.to(document.querySelector('#floating-card'), {
           duration: 0.6,
           rotate: 9,
         })
       }, 3500);
-      // setTimeout(() => {
-      //   tl.to(document.querySelector('#floating-card'), {
-      //     duration: 0.6,
-      //     rotate: 360,
-      //   })
-      // },5000);
-      // tl.set('#floating-card', {
-      //   xPercent: -50,
-      //   yPercent: -50
-      // })
     }
   }
 
   //* Animation for enlarge card
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
+      if (document.getElementById("card-list") !== null) {
+        document.getElementById("card-front").classList.add("hidden")
+      }
+      console.log(document.getElementById("card-front"))
       props.setShowLargeCard(true);
       document.getElementById("floating-card").classList.remove("pointer-events-none")
       document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove);
@@ -194,15 +193,17 @@ function Scene(props) {
       tl.to(document.querySelector('#floating-card'), {
         duration: 0.9,
         ease: "elastic.in",
-        x: props.isMobile ? 140 : constraints.right/2,
-        y: props.isMobile ? 200 : constraints.height/3,
+        x: props.isMobile ? 140 : constraints.right / 2,
+        y: props.isMobile ? 200 : constraints.height / 3,
         ease: "elastic.out"
       })
 
       tl.set("#floating-card", { fontSize: '25%' });
       tl.delay(0.3)
+      setTimeout(() => {
+        document.getElementById("card-front").classList.remove("hidden")
+      }, 400)
     });
-    
   }
 
   //* Actions for dismissing / saving large card, 
@@ -393,6 +394,8 @@ function Scene(props) {
           if (matterCardId !== undefined) {
             props.handleShowingLargeCard(matterCardId)
           }
+          console.log(document.getElementById("card-front"))
+
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
           //Add mouse event to make card enlarge
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease)
@@ -437,32 +440,27 @@ function Scene(props) {
     }
   }
 
-  useEffect(() => {
-  }, [props.backgroundTheme])
-
-
   //Todo: Move to separate component
   return (
-    <div id="scene" className="flex justify-center relative">
+    <div id="scene" className="relative flex justify-center">
       {props.showFollowingCard === true ?
-        <div onClick={() => {props.setCardBackShowing(prevState => !prevState)}}id="floating-card"
-          className="z-50 pointer-events-none select-none absolute w-3/12 bottom-1/5 overflow-hidden pb-3 mr-1 h-36 sm:h-40 top-0 left-0 rounded-sm opacity-90 lg:h-1/4 sm:w-1/12"
+        <div onClick={() => { props.setCardBackShowing(prevState => !prevState) }} id="floating-card"
+          className="absolute top-0 left-0 z-50 w-3/12 pb-3 mr-1 overflow-hidden rounded-sm pointer-events-none select-none bottom-1/5 h-36 sm:h-40 opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
           <div > {props.cardBackShowing ? props.largeCardDataBack : props.largeCardDataFront}</div>
         </div>
         : null}
-      <div id="command-bar" className="bottom-0 fixed left-0 flex h-16 space bg-gray-900 p-3 shadow-md mx-auto rounded-br-md border-gray-300">
+      <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
         <button onClick={() => { extendCommandBar() }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
         <div>
-          <div id="buttons-popup" className="fixed opacity-0 h-16 bottom-0 inline-block w-full bg-gray-900">
-            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10 " onClick={() => setGravity(prevState => !prevState)}>Reverse Gravity</button>
-            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
-            <button className="text-white m-2 outline-none select-none text-bold transform hover:scale-105 z-10" onClick={() => props.setBackgroundTheme(prevState => !prevState)}>{props.backgroundTheme ? "Day" : "Night"}</button>
-            <button className="text-red-400 m-2 justify-end outline-none select-none animate-pulse text-bold transform hover:scale-105 z-10" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+          <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
+            <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
+            <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
+            <button className="z-10 justify-end m-2 text-red-400 transform outline-none select-none animate-pulse text-bold hover:scale-105" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
           </div>
         </div>
       </div>
-      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className=" fixed p-3 border-r-2 select-none border-gray-700 rounded-r-md h-24 w-4/12 left-0 top-36 sm:w-2/12 sm:h-3/6 bg-gray-700 shadow-lg md:p-5 text-green-800 sm:text-3xl"><div className="z-50 border-red-400  text-white"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>
+      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className="fixed left-0 w-4/12 h-24 p-3 text-green-800 bg-gray-700 border-r-2 border-gray-700 shadow-lg select-none rounded-r-md top-36 sm:w-2/12 sm:h-3/6 md:p-5 sm:text-3xl"><div className="z-50 text-white border-red-400"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>
       <div
         ref={boxRef}
         style={{

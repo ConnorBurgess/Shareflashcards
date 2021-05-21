@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
 import popup from '../img/popup.jpg'
-import background from '../img/background_alt.jpg'
+import background from '../img/background.jpg'
 import background_alt from '../img/background_alt.jpg'
 import blank_card from '../img/blank_card.png'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
+import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
 import { handleUpdatingFirestoreCards } from '../lib/firebase'
 
 //! Current scene.js still needs to be broken up into smaller components and refactored
@@ -74,7 +75,7 @@ function Scene(props) {
         showIds: false,
         width: window.innerWidth,
         height: window.innerHeight,
-        background: {background_alt},
+        background: background,
         wireframes: false,
 
       },
@@ -83,7 +84,7 @@ function Scene(props) {
     //* Add platform
     Composite.add(engine.world, [
       Bodies.rectangle(700, 550, 2000, 130, {
-        isStatic: true, render: { fillStyle: '#111827', strokeStyle: 'red' }, chamfer: { radius: 10 }, collisionFilter: {
+        isStatic: true, render: { fillStyle: '#111827' }, chamfer: { radius: 10 }, collisionFilter: {
           group: 0,
           category: 1,
           mask: 1,
@@ -106,7 +107,7 @@ function Scene(props) {
 
     Composite.add(engine.world, mouseConstraint);
     setMouseConstraint(mouseConstraint);
-    extendCommandBar()
+    extendCommandBar();
     Runner.run(engine);
     Render.run(render);
 
@@ -146,63 +147,22 @@ function Scene(props) {
   useEffect(() => {
   }, [props.cardBackShowing])
 
-  //*Animation for card following mouse 
-  //Todo: Move all gsap animations to separate component
+
   function onMouseMove(event) {
     if (props.showFollowingCard) {
-      var tl = gsap.timeline()
-      tl.to(document.querySelector('#floating-card'), {
-        opacity: 1.0,
-        duration: 0.9,
-        scale: 1.0,
-        x: props.isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 : event.offsetX + 50,
-        y: props.isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
-        ease: "power4.out",
-      })
-
-      setTimeout(() => {
-        tl.to(document.querySelector('#floating-card'), {
-          duration: 0.6,
-          rotate: 9,
-        })
-      }, 3500);
+      animFollowing(event, props.isMobile);
     }
   }
-
-  //* Animation for enlarge card
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
       if (document.getElementById("card-list") !== null) {
         document.getElementById("card-front").classList.add("hidden")
       }
-      console.log(document.getElementById("card-front"))
       props.setShowLargeCard(true);
       document.getElementById("floating-card").classList.remove("pointer-events-none")
       document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove);
       document.querySelector('#scene').removeEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease);
-      let tl = gsap.timeline()
-      tl.delay(1);
-      tl.to(document.querySelector('#floating-card'), {
-        opacity: 1.0,
-        duration: 1.7,
-        scale: 3.0,
-        x: props.isMobile ? 140 : event.offsetX,
-        y: props.isMobile ? 200 : event.offsetY,
-        ease: "elastic.out"
-      })
-      tl.to(document.querySelector('#floating-card'), {
-        duration: 0.9,
-        ease: "elastic.in",
-        x: props.isMobile ? 140 : constraints.right / 2,
-        y: props.isMobile ? 200 : constraints.height / 3,
-        ease: "elastic.out"
-      })
-
-      tl.set("#floating-card", { fontSize: '25%' });
-      tl.delay(0.3)
-      setTimeout(() => {
-        document.getElementById("card-front").classList.remove("hidden")
-      }, 400)
+      animEnlarge(event, props.isMobile, constraints);
     });
   }
 
@@ -222,98 +182,11 @@ function Scene(props) {
         handleUpdatingFirestoreCards(matterCard)
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
-        let tl = gsap.timeline()
         if (event.source.constraint.pointA.x > constraints.width / 2) {
-          const saveIcon = document.getElementById("save-icon");
-          tl.from(saveIcon, {
-            perspective: 800,
-            perspectiveOrigin: '50% 50% 0px',
-            duration: 0.3,
-            scale: 0.0,
-            rotate: 360,
-            ease: "elastic.out"
-          })
-          tl.to(saveIcon, {
-            opacity: 1.0,
-            duration: 0.3,
-            scale: 2.0,
-            rotate: 360,
-            ease: "elastic.out"
-          })
-          tl.to(saveIcon, {
-            opacity: 1.0,
-            duration: 0.4,
-            scale: 0,
-            rotate: 360,
-            ease: "elastic.out"
-          })
-          tl.to(document.querySelector('#floating-card'), {
-            opacity: 1.0,
-            transformStyle: "preserve-3d",
-            perspective: 200,
-            perspectiveOrigin: '50% 50% 0px',
-            duration: 0.5,
-            scale: 4.0,
-            x: 0,
-            y: 0,
-            ease: "elastic.out"
-          })
-          tl.to(document.querySelector('#floating-card'), {
-            opacity: 1.0,
-            duration: 1.0,
-            scale: 0,
-            x: props.isMobile ? 300 : 355,
-            y: props.isMobile ? 0 : -15,
-            ease: "elastic.out"
-          })
-          tl.set("#floating-card", { fontSize: '100%' });
-          const saveNav = document.getElementById("saved-nav")
-          tl.to(saveNav, {
-            duration: 0.3,
-            color: "#A75248",
-            scale: 2.0,
-            rotate: 30,
-            ease: "power4.out"
-          })
-          tl.to(saveNav, {
-            duration: 0.3,
-            scale: 1,
-            color: "white",
-            rotate: 0,
-            rotate: 0,
-            ease: "power4.in"
-          })
+          animSave(props.isMobile);
         }
         else {
-          tl.to(document.querySelector('#floating-card'), {
-            opacity: 1.0,
-            transformStyle: "preserve-3d",
-            perspective: 200,
-            perspectiveOrigin: '50% 50% 0px',
-            duration: 0.5,
-            scale: 1.0,
-            x: 140,
-            y: 200,
-            ease: "elastic.out"
-          })
-          tl.set("#floating-card", { fontSize: '100%' });
-          tl.to(document.querySelector('#floating-card'), {
-            opacity: 1.0,
-            duration: 1.0,
-            scale: 0,
-            x: props.isMobile ? 300 : 355,
-            y: props.isMobile ? 0 : 300,
-            ease: "elastic.out"
-          })
-          tl.to(document.querySelector('#floating-card'), {
-            opacity: 1.0,
-            duration: 1.0,
-            scale: 0,
-            rotate: 360,
-            x: props.isMobile ? 300 : 355,
-            y: props.isMobile ? 0 : -400,
-            ease: "elastic.out"
-          })
+          animDismiss(props.isMobile);
         }
       });
     }
@@ -389,15 +262,11 @@ function Scene(props) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
           setMatterCardId(matterCardId)
-
           //* Call function to update floating card with card data
           if (matterCardId !== undefined) {
             props.handleShowingLargeCard(matterCardId)
           }
-          console.log(document.getElementById("card-front"))
-
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchmove' : 'mousemove', onMouseMove)
-          //Add mouse event to make card enlarge
           document.querySelector('#scene').addEventListener(props.isMobile ? 'touchend' : 'mouseup', onRelease)
         }
       });
@@ -406,10 +275,8 @@ function Scene(props) {
   }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
 
   //* Animation for card popup
-  //Todo: Fix to only trigger on clicking div
   useEffect(() => {
     const cardsPopup = document.getElementById("cards-popup");
-
     let tl = gsap.timeline()
     tl.delay(1);
     tl.yoyo(true);
@@ -417,25 +284,16 @@ function Scene(props) {
     tl.to(cardsPopup, { opacity: 1, xPercent: 0, duration: 1.3, ease: "Power1.out" })
     tl.repeatDelay(2.5);
     tl.repeat(1);
-
   }, [props.CardArray])
   //Todo: Implement
 
   //Todo: Move to CommandBar.js component
-  const extendCommandBar = (extended) => {
-    const commandBarButtons = document.getElementById("buttons-popup");
-    let tl = gsap.timeline()
-    if (!commandBarExtended || extended) {
-      tl.from(commandBarButtons, { autoAlpha: 0, xPercent: -75, yPercent: 100 })
-      tl.to(commandBarButtons, { autoAlpha: 50, xPercent: 0, duration: 0.3, ease: "Power4.in" })
-      tl.to(commandBarButtons, { autoAlpha: 100, yPercent: -100, duration: 0.6, ease: "Power4.out" })
-      tl.to(commandBarButtons, { yPercent: 0, duration: 0.6, ease: "bounce" })
+  const extendCommandBar = () => {
+    if (!commandBarExtended) {
+      animExtendCommandBar();
       setCommandBarExtended(true);
-
-    } else if (commandBarExtended || extended) {
-      tl.from(commandBarButtons, { xPercent: 0 })
-      tl.to(commandBarButtons, { yPercent: 100, duration: 0.6, ease: "Power4.in" })
-      tl.to(commandBarButtons, { autoAlpha: 0, xPercent: -100, duration: 1.3, ease: "power4.out" })
+    } else {
+      animHideCommandBar();
       setCommandBarExtended(false);
     }
   }
@@ -451,7 +309,7 @@ function Scene(props) {
         </div>
         : null}
       <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
-        <button onClick={() => { extendCommandBar() }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+        <button onClick={() => { extendCommandBar(); }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
         <div>
           <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
             <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
@@ -466,8 +324,7 @@ function Scene(props) {
         style={{
           width: "100%",
           height: "100%",
-        }}
-      >
+        }}>
       </div>
       <div id="canvas" >
         <canvas

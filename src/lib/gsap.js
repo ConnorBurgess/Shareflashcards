@@ -142,7 +142,7 @@ export const animDismiss = (isMobile) => {
     ease: "elastic.out"
   })
   let randNum = Math.floor(Math.random() * 2);
-  if (randNum = 1) {
+  if (randNum === 1) {
     tl.to(document.querySelector('#floating-card'), {
       opacity: 1.0,
       duration: 1.0,
@@ -164,7 +164,6 @@ export const animDismiss = (isMobile) => {
   }
 }
 
-
 export const animExtendCommandBar = () => {
   const commandBarButtons = document.getElementById("buttons-popup");
   let tl = gsap.timeline();
@@ -180,5 +179,16 @@ export const animHideCommandBar = () => {
   tl.from(commandBarButtons, { xPercent: 0 });
   tl.to(commandBarButtons, { yPercent: 100, duration: 0.6, ease: "Power4.in" });
   tl.to(commandBarButtons, { autoAlpha: 0, xPercent: -100, duration: 1.3, ease: "power4.out" });
+}
 
+export const animPopup = () => {
+  const infoPopup = document.getElementById("info-popup");
+  console.log(infoPopup)
+  let tl = gsap.timeline()
+  tl.delay(1);
+  tl.yoyo(true);
+  tl.from(infoPopup, { autoAlpha: 0, xPercent: -100, rotation: 180 })
+  tl.to(infoPopup, { autoAlpha: 1, xPercent: 0, duration: 1.3, ease: "Power1.out" })
+  tl.repeatDelay(2.5);
+  tl.repeat(1);
 }

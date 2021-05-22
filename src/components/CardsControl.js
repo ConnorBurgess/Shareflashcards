@@ -1,11 +1,13 @@
 import '../App.css';
+import firebase from '../firebase';
+import AddCard from './AddCard';
 import NavBar from './NavBar';
 import Scene from './Scene';
 import ToolTip from './ToolTip';
-import AddCard from './AddCard';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
-import firebase from '../firebase';
+import InfoPopup from './InfoPopup';
+import FloatingCard from './FloatingCard';
 import { useState, useEffect, useRef } from 'react';
 import { handleAddCard, handleGetCards, generateDeck, handleSignUp } from '../lib/firebase';
 import { generateRandomName, deviceDetect } from '../lib/utils'
@@ -124,6 +126,7 @@ function CardsControl() {
       const cardCollection = await handleGetCards();
       setCardArray(cardCollection);
       const currentUser = await firebase.auth().currentUser;
+      
       if (currentUser != null) {
         setUserSignedIn(true);
         document.getElementById("sign-up-nav").classList.add("hidden")
@@ -187,6 +190,9 @@ function CardsControl() {
             : null}
         </div>
         <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
+          <InfoPopup 
+          cardArray={cardArray}
+          />
           {showToolTip ?
             <ToolTip
               setShowToolTip={setShowToolTip} /> : null}</div>
@@ -210,6 +216,13 @@ function CardsControl() {
               generateRandomName={generateRandomName} />
             : null}</div>
         <div className="z-0">
+          <FloatingCard
+            largeCardDataFront={largeCardDataFront}
+            largeCardDataBack={largeCardDataBack}
+            setCardBackShowing={setCardBackShowing}
+            cardBackShowing={cardBackShowing}
+            showFollowingCard={showFollowingCard}
+          />
           <Scene
             isMobile={isMobile}
             userSignedIn={userSignedIn}
@@ -228,8 +241,7 @@ function CardsControl() {
             getCards={handleGetCards}
             generateDeck={generateDeck}
             setGenerateMoreCards={setGenerateMoreCards}
-            largeCardDataFront={largeCardDataFront}
-            largeCardDataBack={largeCardDataBack} />
+          />
         </div>
       </div>
     </>

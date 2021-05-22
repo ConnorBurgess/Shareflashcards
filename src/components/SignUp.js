@@ -1,4 +1,4 @@
-import{ useEffect } from 'react';
+import { useEffect } from 'react';
 
 const SignUp = (props) => {
 
@@ -13,19 +13,19 @@ const SignUp = (props) => {
         <h1 className="text-xl font-semibold">Hello there <br /><button className="text-green-800 transform select-none hover:scale-105 focus:outline-none"
           onClick={() => setUserName(generateRandomName())}>
           {props.userName}</button><span className="ml-1">👋</span>, <br /> <span className="font-normal">Provide an email and password to get exploring</span></h1>
-        <form className="mt-6 w-max" onSubmit={(event) => { 
-          props.handleSignUp(event) 
+        <form className="mt-6 w-max" onSubmit={(event) => {
+          props.handleSignUp(event)
           props.setShowSignUp(prevState => !prevState)
           props.setShowToolTip(prevState => !prevState)
           props.setUserSignedIn(true);
-          }}>
+        }}>
           <label htmlFor="email" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">E-mail</label>
           <input id="email" type="email" name="email" placeholder="" autoComplete="email" className="block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" required />
           <label htmlFor="password" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">Password</label>
           <input id="password" type="password" name="password" placeholder="********" autoComplete="new-password" className="block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" required />
           <label htmlFor="password-confirm" className="block mt-2 text-xs font-semibold text-gray-600 uppercase">Confirm password</label>
           <input id="password-confirm" type="password" name="password-confirm" placeholder="********" autoComplete="new-password" className="block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" required />
-          <input id="userName" type="userName" name="userName"  hidden={true} value={props.userName} readOnly/>
+          <input id="userName" type="userName" name="userName" hidden={true} value={props.userName} readOnly />
           <button type="submit" className="w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg animate-pulse focus:outline-none hover:bg-gray-900 hover:shadow-none">
             Join
       </button>

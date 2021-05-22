@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
-import popup from '../img/popup.jpg'
 import background from '../img/background.jpg'
 // import background_alt from '../img/background_alt.jpg'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
-import { gsap } from "gsap";
 import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
 import { handleUpdatingFirestoreCards } from '../lib/firebase'
 
@@ -40,9 +38,6 @@ function Scene(props) {
     const Engine = Matter.Engine,
       Render = Matter.Render,
       Runner = Matter.Runner,
-      // Common = Matter.Common,
-      // Pairs = Matter.Pairs,
-      // Events = Matter.Events,
       Bodies = Matter.Bodies,
       Mouse = Matter.Mouse,
       MouseConstraint = Matter.MouseConstraint,
@@ -130,6 +125,7 @@ function Scene(props) {
       animFollowing(event, props.isMobile);
     }
   }
+
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
       if (document.getElementById("card-front") !== null) {
@@ -248,20 +244,7 @@ function Scene(props) {
         }
       });
     }
-    //Todo: Necessary dependencies?    
   }, [cardArray, currentDeck, showFollowingCard, showLargeCard, constraints, mEngine, mMouseConstraint]);
-  //* Animation for card popup
-  useEffect(() => {
-    const cardsPopup = document.getElementById("cards-popup");
-    let tl = gsap.timeline()
-    tl.delay(1);
-    tl.yoyo(true);
-    tl.from(cardsPopup, { opacity: 0, xPercent: -100, rotation: 180 })
-    tl.to(cardsPopup, { opacity: 1, xPercent: 0, duration: 1.3, ease: "Power1.out" })
-    tl.repeatDelay(2.5);
-    tl.repeat(1);
-  }, [props.CardArray])
-  //Todo: Implement
 
   //Todo: Move to CommandBar.js component
   const extendCommandBar = () => {
@@ -287,7 +270,6 @@ function Scene(props) {
           </div>
         </div>
       </div>
-      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className="fixed left-0 w-4/12 h-24 p-3 text-green-800 bg-gray-700 border-r-2 border-gray-700 shadow-lg select-none rounded-r-md top-36 sm:w-2/12 sm:h-3/6 md:p-5 sm:text-3xl"><div className="z-50 text-white border-red-400"> New Cards: {cardArray.length} <br></br> Tags: All </div></div>
       <div
         ref={boxRef}
         style={{

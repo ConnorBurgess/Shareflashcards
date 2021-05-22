@@ -9,10 +9,10 @@ const ToolTip = (props) => (
         </svg>
         <h1 className="pl-3 text-lg font-bold text-left text-gray-800 dark:text-gray-100">Welcome to shareflashcards</h1>
       </div>
-      <p className="pt-6 font-normal text-left text-gray-600 text-md dark:text-gray-100"> 
-      <li> <span className="text-green-800">Chill out</span> and check out flash cards from users globally </li> 
-      <li> Tap a card to see pop up it's contents</li> 
-      <li> Cards can be saved by tapping the right side of the screen, or left side to discard.</li>
+      <p className="pt-6 font-normal text-left text-gray-600 text-md dark:text-gray-100">
+        <li> <span className="text-green-800">Chill out</span> and check out flash cards from users globally </li>
+        <li> Tap a card to see pop up it's contents</li>
+        <li> Cards can be saved by tapping the right side of the screen, or left side to discard.</li>
       </p>
       <div className="flex items-center justify-between pt-6">
         <button onClick={() => props.setShowToolTip(false)} className="py-3.5 w-full text-white focus:outline-none hover:opacity-90 text-sm font-semibold border rounded border-indigo-700 bg-indigo-700 leading-3">Okay!</button>
@@ -22,6 +22,6 @@ const ToolTip = (props) => (
 );
 
 ToolTip.propTypes = {
-  handleToolTipDisplaying : PropTypes.func
+  handleToolTipDisplaying: PropTypes.func
 }
 export default ToolTip;

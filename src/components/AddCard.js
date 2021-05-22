@@ -9,7 +9,7 @@ const AddCard = (props) => {
 
   useEffect(() => {
     setInterval(() => { setTag(tagArr[Math.floor(Math.random() * (tagArr.length))]) }, 3000);
-  }, []);
+  }, [tagArr]);
   return (
     <>
       <form onSubmit={(event) => {

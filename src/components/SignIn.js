@@ -42,7 +42,7 @@ const SignIn = (props) => {
                     <input id="email" type="email" className="w-full px-4 py-1 mb-6 text-gray-700 placeholder-gray-700 bg-gray-200 border border-gray-400 rounded focus:bg-white focus:outline-none" placeholder="Email Address" />
                     <input id="password" type="password" className="w-full px-4 py-1 mb-4 text-gray-700 placeholder-gray-700 bg-gray-200 border border-gray-400 rounded focus:bg-white focus:outline-none" placeholder="Password" />
                     <div className="flex items-center justify-between">
-                      <a href="#" className="text-gray-600">Forget Password?</a>
+                      {/* <a href="#" className="text-gray-600">Forget Password?</a> */}
                       <button type="submit" className="px-2 py-1 text-gray-200 bg-gray-800 rounded">Sign In</button>
                     </div>
                   </form>

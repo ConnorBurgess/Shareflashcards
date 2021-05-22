@@ -19,22 +19,20 @@ export default function NavBar(props) {
 
   return (
     <>
-      <nav class="bg-gray-900 shadow select-none" role="navigation">
-        <div class="container  mx-auto p-4 flex flex-wrap items-center md:flex-no-wrap">
-          <div class="mr-3 md:mr-8 pointer-events-none">
-            <a href="#" rel="home">
-              <img width="150" height="280" className="select-none" src={logo}></img>
-            </a>
+      <nav className="bg-gray-900 shadow select-none" role="navigation">
+        <div className="container flex flex-wrap items-center p-4 mx-auto md:flex-no-wrap">
+          <div className="mr-3 pointer-events-none md:mr-8">
+            <img width="150" alt="" height="280" className="select-none" src={logo}></img>
           </div>
-          <div class="ml-auto md:hidden">
-            <button class="flex items-center px-3 py-2 border rounded" type="button">
-              <svg class="h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <div className="ml-auto md:hidden">
+            <button className="flex items-center px-3 py-2 border rounded" type="button">
+              <svg className="w-3 h-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <title>Menu</title>
                 <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
               </svg>
             </button>
           </div>
-          <div class="w-full md:w-auto md:flex-grow md:flex md:items-center">
+          <div className="w-full md:w-auto md:flex-grow md:flex md:items-center">
             <div className=" sm:block sm:ml-6">
               <div className="flex space-x-4">
                 {navigation.map((item) => (

@@ -1,4 +1,4 @@
-import firebase, { firestore, auth } from '../firebase';
+import firebase, { firestore } from '../firebase';
 //* Handles adding a new card to firestore
 export const handleAddCard = (event) => {
   event.preventDefault();
@@ -72,13 +72,13 @@ export const handleSignUp = async newUser => {
 export const handleSignIn = (event) => {
   console.log(event);
 firebase.auth().signInWithEmailAndPassword(event.target.email.value, event.target.password.value)
-  .then((userCredential) => {
-    var user = userCredential.user;
-  })
+  // .then((userCredential) => {
+  //   var user = userCredential.user;
+  // })
   .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    console.log(errorMessage);
+    // var errorCode = error.code;
+    // var errorMessage = error.message;
+    // console.log(errorMessage);
   });
 }
 
@@ -98,7 +98,7 @@ export const handleUpdatingFirestoreCards = async cardId => {
 
   try {
     const currentUser = await firebase.auth().currentUser;
-    if (currentUser.uid != undefined) {
+    if (currentUser.uid !== undefined) {
       await firestore.collection("users").doc(currentUser.uid).update({ "savedCards" : firebase.firestore.FieldValue.arrayUnion(cardId)})
     }
   } catch (err) {

@@ -6,9 +6,9 @@ import AddCard from './AddCard';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import firebase from '../firebase';
-import react, { useState, useEffect, useRef } from 'react';
-import {handleAddCard, handleGetCards, generateDeck, handleSignUp } from '../lib/firebase';
-import {generateRandomName, deviceDetect} from '../lib/utils'
+import { useState, useEffect, useRef } from 'react';
+import { handleAddCard, handleGetCards, generateDeck, handleSignUp } from '../lib/firebase';
+import { generateRandomName, deviceDetect } from '../lib/utils'
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 gsap.registerPlugin(Draggable);
@@ -24,12 +24,8 @@ function CardsControl() {
   //Todo: CurrentDeck is just a sorted cardArray in current implementation
   const [cardArray, setCardArray] = useState([{}]);
   const [currentDeck, setCurrentDeck] = useState([]);
-
-  //* Card displayed after user releases mouseup on matter object
   const [showLargeCard, setShowLargeCard] = useState(false);
   const [cardBackShowing, setCardBackShowing] = useState(false);
-
-  //* Card currently following pointer
   const [showFollowingCard, setFollowingCard] = useState(false);
 
   //* Holds card data which is updated when card is enlarged
@@ -38,7 +34,7 @@ function CardsControl() {
 
   //* Button to toggle card generation on/off
   //Todo: Implement functionality
-  const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
+  // const [currentlyGeneratingCards, setCurrentlyGeneratingCards] = useState(false);
 
   //* Boost for more cards
   //Todo: Fix, currently generates using a function with setInterval which is nasty
@@ -46,10 +42,8 @@ function CardsControl() {
 
   //* Generates a new username when user clicks button
   //? Does this need to be here?
-  const [userName, setUserName] = useState(null);
+  const [userName, setUserName] = useState("");
   const [userSignedIn, setUserSignedIn] = useState(false);
-
-  //* Responsiveness
   const [isMobile, setIsMobile] = useState(false);
 
   // * Draggable elements
@@ -61,29 +55,29 @@ function CardsControl() {
 
   const handleShowingLargeCard = (id) => {
     const clickedCard = cardArray.find(e => e.id === id);
-    if (clickedCard != undefined) {
+    if (clickedCard !== undefined) {
       setLargeCardDataFront(
-        <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
+        <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md sm:pt-2 justify-items-center">
           <div className="text-center">
-            <h1 className="text-sm font-bold text-green-800">{clickedCard.data.title} </h1>
-            <span> 05/17/21</span>
+            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title} </h1>
           </div>
-          <h2 className="mb-1 mr-2 italic text-center text-bold sm:mb-1">Ruthless Butterscotch</h2>
+          <div id="card-created-by" className="text-center">Card created by</div>
+          <h2 id="card-username" className="mr-2 italic text-center text-bold ">Username</h2>
           <br />
-          <div id="card-front" className="flex ml-2 mr-1 lg:text-xs mb-7">
+          <div id="card-front" className="flex ml-2 mr-1 text-black mb-7">
             {clickedCard.data.front}
           </div>
         </div>
         </>)
       setLargeCardDataBack(
-        <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
+        <><div className="relative pt-2 my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
           <div className="text-center">
-            <h1 className="text-sm font-bold text-green-800">{clickedCard.data.title} </h1>
-            <span> 05/17/21</span>
+            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title} </h1>
           </div>
-          <h2 className="mb-1 mr-2 italic text-center text-bold sm:mb-1">Ruthless Butterscotch</h2>
+          <div id="card-created-by" className="text-center">Card created by</div>
+          <h2 id="card-username" className="mr-2 italic text-center text-bold sm:mb-1">Username</h2>
           <br />
-          <div id="card-back" className="flex ml-2 mr-1 lg:text-xs mb-7">
+          <div id="card-front" className="flex ml-2 mr-1 mb-7">
             {clickedCard.data.back}
           </div>
         </div>
@@ -123,7 +117,7 @@ function CardsControl() {
       bounds: appBox.current,
       throwProps: true,
       dragClickables: false
-    },[]);
+    }, []);
 
     //* Fetch firestore data on mount
     const fetchData = async () => {
@@ -203,7 +197,7 @@ function CardsControl() {
               setShowAddCard={setShowAddCard}
             />
             : null} </div>
-        <div id="veil" className="absolute z-30 w-full h-full bg-gray-800 pointer-events-none opacity-40"></div>
+        <div id="veil" className="absolute z-30 w-full h-full bg-gray-800 pointer-events-none opacity-70"></div>
         <div ref={draggableSignUp} className="absolute z-50 m-20 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
           {showSignUp ?
             <SignUp
@@ -234,7 +228,6 @@ function CardsControl() {
             getCards={handleGetCards}
             generateDeck={generateDeck}
             setGenerateMoreCards={setGenerateMoreCards}
-            setCurrentlyGeneratingCards={setCurrentlyGeneratingCards}
             largeCardDataFront={largeCardDataFront}
             largeCardDataBack={largeCardDataBack} />
         </div>

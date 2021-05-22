@@ -1,9 +1,10 @@
 # Shareflashcards
 #### Created By: Connor Burgess 
 * * *
-* Heavily WIP, very buggy / code needs to be refactored and separated to components 5.20.21
+* Buggy / code needs to be refactored and separated to components 5.20.21
+* See 'Known bugs.'
 ## Description  
-Responsive web application allowing users to contribute flash cards to community and send cards to friends. Uses Matter.js physics engine to allow users to explore database visually and build sets off discovered cards. Site built using React and styled with Tailwind. Backend NOSQL database managed through Firebase.
+Web application allowing users to contribute flash cards to community and send cards to friends. Uses Matter.js physics engine to allow users to explore database visually and build sets off discovered cards. Site built using React and styled with Tailwind. Backend NOSQL database managed through Firebase. Current implementation allows users to add new cards to database as well as have cards from the DB randomly shown.
 * * *
 
 ## User Stories
@@ -41,7 +42,7 @@ Responsive web application allowing users to contribute flash cards to community
 | Bug | Reason | Possible solution  | State (fixed/current)|
 | :-------------: |  :------------: | :-------------: |:-------------: |
 | Matter mouse events continually adding events to mMouseConstraint | Need to look over event handlers in Scene.js | Fix event handlers | ❌  **Current**|
-
+| Issues with animations if users click too fast | Need to implement more checks to GSAP animations | Fix animations | ❌  **Current**|
 
 ## License:
 > *&copy; Connor Burgess, 2021*

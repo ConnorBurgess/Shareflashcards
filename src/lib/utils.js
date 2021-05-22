@@ -1,6 +1,3 @@
-import firebase, { firestore, auth } from '../firebase';
-
-//Generates a random username
 export const generateRandomName = () => {
   let firstArr = ["ruthless", "smart", "eager", "envious", "energetic", "joyous", "shiny", "sleepy"]
   let secondArr = ["butterscotch", "sardine", "iguana", "walrus", "rhinoceros", "kitten", "albatross"]
@@ -15,7 +12,7 @@ export const deviceDetect = () => {
   const userAgent =
     typeof window.navigator === "undefined" ? "" :
       navigator.userAgent;
-  if (userAgent != "") {
+  if (userAgent !== "") {
     const mobile = Boolean(userAgent.match(
       /Android|BlackBerry|iPhone|iPad|iPod|Opera|Mini|IEMobile|WPDesktop/i
     )

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
 import popup from '../img/popup.jpg'
 import background from '../img/background.jpg'
-import background_alt from '../img/background_alt.jpg'
+// import background_alt from '../img/background_alt.jpg'
 import blank_card from '../img/blank_card.png'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
@@ -19,19 +19,15 @@ const floatingCardStyle = {
   backgroundImage: `url(${blank_card})`,
   backfaceVisibility: "hidden",
   object_fit: "cover",
-  overflow: "hidden",
   backgroundSize: "100%",
   backgroundRepeat: "no-repeat"
 }
 
 function Scene(props) {
 
-  //? Should this be here?
-  //Todo: Use context with core matter components and otherwise refactor state
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
-  const [userClicks, setUserClicks] = useState(1);
   const [matterCard, setMatterCardId] = useState(null);
 
   const boxRef = useRef(null)
@@ -41,11 +37,14 @@ function Scene(props) {
   //* Responsive state
   const [constraints, setContraints] = useState()
   const [commandBarExtended, setCommandBarExtended] = useState(false)
-  const [mRender, setRender] = useState(false);
   const [scene, setScene] = useState()
+  
   const handleResize = () => {
     setContraints(boxRef.current.getBoundingClientRect())
   }
+
+  const { cardArray, currentDeck, showFollowingCard, showLargeCard } = props;
+
 
   useEffect(() => {
 
@@ -53,12 +52,11 @@ function Scene(props) {
     const Engine = Matter.Engine,
       Render = Matter.Render,
       Runner = Matter.Runner,
-      World = Matter.World,
-      Common = Matter.Common,
-      Pairs = Matter.Pairs,
+      // Common = Matter.Common,
+      // Pairs = Matter.Pairs,
+      // Events = Matter.Events,
       Bodies = Matter.Bodies,
       Mouse = Matter.Mouse,
-      Events = Matter.Events,
       MouseConstraint = Matter.MouseConstraint,
       Composite = Matter.Composite;
 
@@ -68,7 +66,6 @@ function Scene(props) {
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
-
       canvas: canvasRef.current,
       options: {
         showAngleIndicator: false,
@@ -77,11 +74,9 @@ function Scene(props) {
         height: window.innerHeight,
         background: background,
         wireframes: false,
-
       },
     })
-    setRender(render);
-    //* Add platform
+
     Composite.add(engine.world, [
       Bodies.rectangle(700, 550, 2000, 130, {
         isStatic: true, render: { fillStyle: '#111827' }, chamfer: { radius: 10 }, collisionFilter: {
@@ -93,7 +88,6 @@ function Scene(props) {
       }),
     ]);
 
-    //* Implement mouse control
     var mouse = Mouse.create(render.canvas),
       mouseConstraint = MouseConstraint.create(engine, {
         mouse: mouse,
@@ -110,7 +104,6 @@ function Scene(props) {
     extendCommandBar();
     Runner.run(engine);
     Render.run(render);
-
     setContraints(boxRef.current.getBoundingClientRect())
     setScene(render)
 
@@ -149,13 +142,13 @@ function Scene(props) {
 
 
   function onMouseMove(event) {
-    if (props.showFollowingCard) {
+    if (showFollowingCard) {
       animFollowing(event, props.isMobile);
     }
   }
   function onRelease(event) {
     Matter.Events.on(mMouseConstraint, "mouseup", (event) => {
-      if (document.getElementById("card-list") !== null) {
+      if (document.getElementById("card-front") !== null) {
         document.getElementById("card-front").classList.add("hidden")
       }
       props.setShowLargeCard(true);
@@ -175,7 +168,7 @@ function Scene(props) {
     if (mMouseConstraint !== null) {
       Matter.Events.off(mMouseConstraint, "mouseup")
     }
-    if (mMouseConstraint != null && props.showLargeCard && props.userSignedIn) {
+    if (mMouseConstraint != null && showLargeCard && props.userSignedIn) {
       props.setCardBackShowing(false);
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         document.getElementById("floating-card").classList.add("pointer-events-none")
@@ -190,7 +183,7 @@ function Scene(props) {
         }
       });
     }
-  }, [props.showLargeCard])
+  }, [showLargeCard])
 
   //Animation for handling bottom command bar
   //* Check if user presses gravity button
@@ -210,7 +203,7 @@ function Scene(props) {
   useEffect(() => {
 
     const generateMatterCard = () => {
-      let newBody = Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
+      return Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
         isStatic: false,
         angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
         chamfer: { radius: 1 },
@@ -232,11 +225,11 @@ function Scene(props) {
             texture: blank_card_small,
           }
         },
-        id: props.currentDeck[props.currentDeck.length - 1].id
+        id: currentDeck[currentDeck.length - 1].id
       })]);
 
     }
-    for (let i = 0; i < props.currentDeck.length; i++) {
+    for (let i = 0; i < currentDeck.length; i++) {
       //* Random card generation at slightly different times visual effect
       let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10
 
@@ -244,21 +237,21 @@ function Scene(props) {
         generateMatterCard();
 
       }, randomTime);
-      props.currentDeck.pop()
+      currentDeck.pop()
       // props.setCurrentDeck(prevDeck => prevDeck.filter((element, index) => index < prevDeck.length - 1))
     }
-  }, [props.currentDeck])
+  }, [currentDeck, mEngine])
 
   //* Handle adding floating div to mouse movement
   //Todo: Move to mouse constraint component
   useEffect(() => {
 
     //* Add floating div movement event 
-    if (mMouseConstraint !== null && mEngine !== null && props.cardArray !== undefined) {
+    if (mMouseConstraint !== null && mEngine !== null && cardArray !== undefined) {
 
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
-        if (getClickedBody.length !== 0 && props.cardArray.length > 1 && getClickedBody !== undefined) {
+        if (getClickedBody.length !== 0 && cardArray.length > 1 && getClickedBody !== undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
           setMatterCardId(matterCardId)
@@ -272,8 +265,7 @@ function Scene(props) {
       });
     }
     //Todo: Necessary dependencies?    
-  }, [props.cardArray, props.currentDeck, props.showFollowingCard, props.showLargeCard]);
-
+  }, [cardArray, currentDeck, showFollowingCard, showLargeCard, constraints, mEngine, mMouseConstraint]);
   //* Animation for card popup
   useEffect(() => {
     const cardsPopup = document.getElementById("cards-popup");
@@ -301,7 +293,7 @@ function Scene(props) {
   //Todo: Move to separate component
   return (
     <div id="scene" className="relative flex justify-center">
-      {props.showFollowingCard === true ?
+      {showFollowingCard === true ?
         <div onClick={() => { props.setCardBackShowing(prevState => !prevState) }} id="floating-card"
           className="absolute top-0 left-0 z-50 w-3/12 pb-3 mr-1 overflow-hidden rounded-sm pointer-events-none select-none bottom-1/5 h-36 sm:h-40 opacity-90 lg:h-1/4 sm:w-1/12"
           style={floatingCardStyle}>
@@ -309,7 +301,7 @@ function Scene(props) {
         </div>
         : null}
       <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
-        <button onClick={() => { extendCommandBar(); }} className="mr-4"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+        <button onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
         <div>
           <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
             <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
@@ -318,7 +310,7 @@ function Scene(props) {
           </div>
         </div>
       </div>
-      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className="fixed left-0 w-4/12 h-24 p-3 text-green-800 bg-gray-700 border-r-2 border-gray-700 shadow-lg select-none rounded-r-md top-36 sm:w-2/12 sm:h-3/6 md:p-5 sm:text-3xl"><div className="z-50 text-white border-red-400"> New Cards: {props.cardArray.length} <br></br> Tags: All </div></div>
+      <div id="cards-popup" style={{ backgroundImage: `url(${popup})` }} className="fixed left-0 w-4/12 h-24 p-3 text-green-800 bg-gray-700 border-r-2 border-gray-700 shadow-lg select-none rounded-r-md top-36 sm:w-2/12 sm:h-3/6 md:p-5 sm:text-3xl"><div className="z-50 text-white border-red-400"> New Cards: {cardArray.length} <br></br> Tags: All </div></div>
       <div
         ref={boxRef}
         style={{

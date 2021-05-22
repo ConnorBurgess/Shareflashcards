@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types'
 const AddCard = (props) => {
 
   const [titleCount, setTitleCount] = useState(40);
@@ -10,6 +11,7 @@ const AddCard = (props) => {
   useEffect(() => {
     setInterval(() => { setTag(tagArr[Math.floor(Math.random() * (tagArr.length))]) }, 3000);
   }, [tagArr]);
+
   return (
     <>
       <form onSubmit={(event) => {
@@ -126,5 +128,8 @@ const AddCard = (props) => {
   )
 };
 
+AddCard.propTypes = {
+  setShowAddCard : PropTypes.func,
+}
 export default AddCard;
 

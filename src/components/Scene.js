@@ -259,29 +259,31 @@ function Scene(props) {
 
   //Todo: Move to separate component
   return (
-    <div id="scene" className="relative flex justify-center">
-      <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
-        <button onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
-        <div>
-          <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
-            <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
-            <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
-            <button className="z-10 justify-end m-2 text-red-400 transform outline-none select-none animate-pulse text-bold hover:scale-105" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+    <>
+      <div id="scene" className="relative flex justify-center">
+        <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
+          <button onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+          <div>
+            <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
+              <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
+              <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105" onClick={() => props.setGenerateMoreCards(prevState => prevState + 1)}>Card Boost</button>
+              <button className="z-10 justify-end m-2 text-red-400 transform outline-none select-none animate-pulse text-bold hover:scale-105" onClick={() => props.setCurrentlyGeneratingCards(prevState => !prevState)}>Exploring cards . . .</button>
+            </div>
           </div>
         </div>
+        <div
+          ref={boxRef}
+          style={{
+            width: "100%",
+            height: "100%",
+          }}>
+        </div>
+        <div id="canvas" >
+          <canvas
+            ref={canvasRef} />
+        </div>
       </div>
-      <div
-        ref={boxRef}
-        style={{
-          width: "100%",
-          height: "100%",
-        }}>
-      </div>
-      <div id="canvas" >
-        <canvas
-          ref={canvasRef} />
-      </div>
-    </div>
+    </>
   )
 }
 

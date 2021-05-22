@@ -71,6 +71,7 @@ function CardsControl() {
           </div>
         </div>
         </>)
+        
       setLargeCardDataBack(
         <><div className="relative pt-2 my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
           <div className="text-center">

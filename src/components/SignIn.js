@@ -1,5 +1,7 @@
 import { handleSignIn } from '../lib/firebase'
+import PropTypes from 'prop-types'
 const SignIn = (props) => {
+  
   return (
     <>
       <header className=" bg-cover h-full bg-gray-700 z-50 {-- h-screen --} w-full">
@@ -55,5 +57,10 @@ const SignIn = (props) => {
     </>
   )
 };
+
+SignIn.propTypes = {
+  setShowSignUp: PropTypes.func,
+  setShowSignIn: PropTypes.func
+}
 
 export default SignIn;

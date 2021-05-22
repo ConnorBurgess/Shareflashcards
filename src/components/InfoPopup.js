@@ -3,7 +3,7 @@ import popup from '../img/popup.jpg'
 import { animPopup } from '../lib/gsap';
 import { useEffect } from 'react';
 
-export const InfoPopup = (props) => {
+const InfoPopup = (props) => {
   const { cardArray } = props;
 
   const infoPopupStyle = {
@@ -12,7 +12,8 @@ export const InfoPopup = (props) => {
 
   useEffect(() => {
     animPopup();
-  },[])
+  }, [])
+  
   return (
     <>
       <div id="info-popup"

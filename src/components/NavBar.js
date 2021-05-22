@@ -1,7 +1,7 @@
 import React from 'react'
 import logo from '../img/logo.png'
 import { handleSignOut } from '../lib/firebase';
-
+import PropTypes from 'prop-types'
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -79,4 +79,10 @@ export default function NavBar(props) {
       </nav>
     </>
   )
+}
+NavBar.propTypes = {
+  setShowAddCard: PropTypes.func,
+  setUserSignedIn: PropTypes.func,
+  setShowSignUp: PropTypes.func,
+  setShowSignIn: PropTypes.func
 }

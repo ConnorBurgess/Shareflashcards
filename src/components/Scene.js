@@ -3,7 +3,6 @@ import Matter from "matter-js";
 import popup from '../img/popup.jpg'
 import background from '../img/background.jpg'
 // import background_alt from '../img/background_alt.jpg'
-import blank_card from '../img/blank_card.png'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { gsap } from "gsap";
@@ -12,17 +11,6 @@ import { handleUpdatingFirestoreCards } from '../lib/firebase'
 
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
-
-//* Holds style for pop up div when hovering over a Matter.js card
-//? Is this style necessary?
-const floatingCardStyle = {
-  backgroundImage: `url(${blank_card})`,
-  backfaceVisibility: "hidden",
-  object_fit: "cover",
-  backgroundSize: "100%",
-  backgroundRepeat: "no-repeat"
-}
-
 function Scene(props) {
 
   const [mEngine, setEngine] = useState(null);
@@ -38,7 +26,7 @@ function Scene(props) {
   const [constraints, setContraints] = useState()
   const [commandBarExtended, setCommandBarExtended] = useState(false)
   const [scene, setScene] = useState()
-  
+
   const handleResize = () => {
     setContraints(boxRef.current.getBoundingClientRect())
   }
@@ -136,10 +124,6 @@ function Scene(props) {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
-
-  useEffect(() => {
-  }, [props.cardBackShowing])
-
 
   function onMouseMove(event) {
     if (showFollowingCard) {
@@ -293,13 +277,6 @@ function Scene(props) {
   //Todo: Move to separate component
   return (
     <div id="scene" className="relative flex justify-center">
-      {showFollowingCard === true ?
-        <div onClick={() => { props.setCardBackShowing(prevState => !prevState) }} id="floating-card"
-          className="absolute top-0 left-0 z-50 w-3/12 pb-3 mr-1 overflow-hidden rounded-sm pointer-events-none select-none bottom-1/5 h-36 sm:h-40 opacity-90 lg:h-1/4 sm:w-1/12"
-          style={floatingCardStyle}>
-          <div > {props.cardBackShowing ? props.largeCardDataBack : props.largeCardDataFront}</div>
-        </div>
-        : null}
       <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
         <button onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
         <div>
@@ -325,6 +302,7 @@ function Scene(props) {
     </div>
   )
 }
+
 Scene.propTypes = {
   isMobile: PropTypes.bool,
   getCards: PropTypes.func,

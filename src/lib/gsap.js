@@ -166,6 +166,8 @@ export const animDismiss = (isMobile) => {
 
 export const animExtendCommandBar = () => {
   const commandBarButtons = document.getElementById("buttons-popup");
+  document.getElementById("command-bar-button").disabled = true;
+  
   let tl = gsap.timeline();
   tl.from(commandBarButtons, { autoAlpha: 0, xPercent: -75, yPercent: 100 });
   tl.to(commandBarButtons, { autoAlpha: 50, xPercent: 0, duration: 0.3, ease: "Power4.in" });
@@ -183,7 +185,6 @@ export const animHideCommandBar = () => {
 
 export const animPopup = () => {
   const infoPopup = document.getElementById("info-popup");
-  console.log(infoPopup)
   let tl = gsap.timeline()
   tl.delay(1);
   tl.yoyo(true);

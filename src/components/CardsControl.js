@@ -1,22 +1,23 @@
 import '../App.css';
-import firebase from '../firebase';
 import AddCard from './AddCard';
 import NavBar from './NavBar';
 import Scene from './Scene';
 import ToolTip from './ToolTip';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import SavedCards from './SavedCards';
 import InfoPopup from './InfoPopup';
 import FloatingCard from './FloatingCard';
-import { useState, useEffect, useRef } from 'react';
-import { handleAddCard, handleGetCards, generateDeck, handleSignUp } from '../lib/firebase';
+import { useState, useEffect, useRef, useContext } from 'react';
+import { handleAddCard, handleGetCards, generateDeck, handleSignUp, handleGetDisplayName } from '../lib/firebase';
 import { generateRandomName, deviceDetect } from '../lib/utils'
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
+import {UserContext, UserProvider} from '../context/UserContext';
 gsap.registerPlugin(Draggable);
 
 function CardsControl() {
-
+  const {authUser, setAuthUser} = useContext(UserContext);
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
@@ -55,13 +56,14 @@ function CardsControl() {
   const draggableAddCard = useRef(null);
   const appBox = useRef(null);
 
+
   const handleShowingLargeCard = (id) => {
     const clickedCard = cardArray.find(e => e.id === id);
     if (clickedCard !== undefined) {
       setLargeCardDataFront(
         <><div className="relative my-4 ml-4 mr-4 overflow-hidden rounded-md sm:pt-2 justify-items-center">
           <div className="text-center">
-            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title} </h1>
+            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title}</h1>
           </div>
           <div id="card-created-by" className="text-center">Card created by</div>
           <h2 id="card-username" className="mr-2 italic text-center text-bold ">Username</h2>
@@ -71,11 +73,10 @@ function CardsControl() {
           </div>
         </div>
         </>)
-        
       setLargeCardDataBack(
         <><div className="relative pt-2 my-4 ml-4 mr-4 overflow-hidden rounded-md justify-items-center">
           <div className="text-center">
-            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title} </h1>
+            <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title}</h1>
           </div>
           <div id="card-created-by" className="text-center">Card created by</div>
           <h2 id="card-username" className="mr-2 italic text-center text-bold sm:mb-1">Username</h2>
@@ -89,8 +90,8 @@ function CardsControl() {
   }
 
   useEffect(() => {
-    var tl = gsap.timeline()
     const veil = document.getElementById("veil");
+    var tl = gsap.timeline()
     if (showAddCard || showToolTip || showSignUp || showSignIn || showLargeCard) {
       tl.to(veil, {
         duration: 2.0,
@@ -105,7 +106,7 @@ function CardsControl() {
     }
   }, [showToolTip, showAddCard, showSignUp, showSignIn, showLargeCard]);
 
-  //* Components draggable upon component mount
+  //* Components draggable upon mount
   useEffect(() => {
     Draggable.create(draggableToolTip.current, {
       bounds: appBox.current,
@@ -126,18 +127,34 @@ function CardsControl() {
     const fetchData = async () => {
       const cardCollection = await handleGetCards();
       setCardArray(cardCollection);
-      const currentUser = await firebase.auth().currentUser;
-      
-      if (currentUser != null) {
+      if (authUser != null) {
         setUserSignedIn(true);
         document.getElementById("sign-up-nav").classList.add("hidden")
         document.getElementById("sign-in-nav").classList.add("hidden")
         document.getElementById("sign-out-nav").classList.remove("hidden")
       }
+      else {
+        setTimeout(() => {
+          document.getElementById("welcome-back").classList.remove("animate-pulse")
+        }, 3000)
+      }
     }
     fetchData();
     setIsMobile(deviceDetect());
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+    }
+    if (userSignedIn) {
+      document.getElementById("welcome-back").classList.add("animate-pulse")
+      fetchUser();
+      setTimeout(() => {
+        document.getElementById("welcome-back").classList.remove("animate-pulse")
+      }, 3000)
+    }
+  }, [userSignedIn])
+
 
   useEffect(() => {
     if (userSignedIn) {
@@ -180,20 +197,23 @@ function CardsControl() {
             setShowSignUp={setShowSignUp}
             setShowSignIn={setShowSignIn}
           />
+          <div className="z=50 absolute left-1/2 top-3/4">
+            <SavedCards /> </div>
         </div>
         <div className="absolute z-50 h-max w-max">
           {showSignIn ?
             <SignIn
+              setUserSignedIn={setUserSignedIn}
               setShowSignIn={setShowSignIn}
               cardArray={cardArray.length}
               setShowSignUp={setShowSignUp}
             />
             : null}
         </div>
-        <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
-          <InfoPopup 
+        <InfoPopup
           cardArray={cardArray}
-          />
+        />
+        <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
           {showToolTip ?
             <ToolTip
               setShowToolTip={setShowToolTip} /> : null}</div>
@@ -208,7 +228,6 @@ function CardsControl() {
         <div ref={draggableSignUp} className="absolute z-50 m-20 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
           {showSignUp ?
             <SignUp
-              handleSignUp={handleSignUp}
               setShowSignUp={setShowSignUp}
               setUserName={setUserName}
               setShowToolTip={setShowToolTip}

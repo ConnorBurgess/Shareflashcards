@@ -31,7 +31,6 @@ function Scene(props) {
 
   const { cardArray, currentDeck, showFollowingCard, showLargeCard } = props;
 
-
   useEffect(() => {
 
     //* Core matter engine / canvas initialization
@@ -46,6 +45,7 @@ function Scene(props) {
     let engine = Engine.create({});
 
     setEngine(engine);
+
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
@@ -82,20 +82,18 @@ function Scene(props) {
         }
       });
 
-    Composite.add(engine.world, mouseConstraint);
+    window.addEventListener('resize', handleResize)
     setMouseConstraint(mouseConstraint);
     extendCommandBar();
-    Runner.run(engine);
-    Render.run(render);
     setContraints(boxRef.current.getBoundingClientRect())
     setScene(render)
-
-    window.addEventListener('resize', handleResize)
+    Composite.add(engine.world, mouseConstraint);
+    Runner.run(engine);
+    Render.run(render);
   }, [])
 
   //* Responsive canvas
   useEffect(() => {
-
     if (constraints) {
       let { width, height } = constraints
       scene.bounds.max.x = width
@@ -105,7 +103,6 @@ function Scene(props) {
       scene.canvas.width = width
       scene.canvas.height = height
 
-      //* Responsive static body
       const floor = scene.engine.world.bodies.filter(e => e.id.length < 1)
       Matter.Body.setPosition(floor[0], {
         x: width / 2,
@@ -165,12 +162,11 @@ function Scene(props) {
     }
   }, [showLargeCard])
 
-  //Animation for handling bottom command bar
   //* Check if user presses gravity button
   //? Should this be removed?
   useEffect(() => {
     if (mGravity && mEngine !== null) {
-      mEngine.world.gravity.y = 0.33;
+      mEngine.world.gravity.y = 0.53;
     }
     else if (mEngine !== null) {
       mEngine.world.gravity.y = -0.2;
@@ -189,7 +185,7 @@ function Scene(props) {
         chamfer: { radius: 1 },
         density: 0.2,
         force: { x: 2, y: 3 },
-        restitituion: 1,
+        restitituion: 0.6,
         frictionAir: 0.001,
         collisionFilter: {
           group: 0,
@@ -207,8 +203,8 @@ function Scene(props) {
         },
         id: currentDeck[currentDeck.length - 1].id
       })]);
-
     }
+
     for (let i = 0; i < currentDeck.length; i++) {
       //* Random card generation at slightly different times visual effect
       let randomTime = Math.floor(Math.random() * (400 - 10 + 1)) + 10
@@ -262,7 +258,7 @@ function Scene(props) {
     <>
       <div id="scene" className="relative flex justify-center">
         <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
-          <button onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+          <button id="command-bar-button" onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
           <div>
             <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
               <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>
@@ -278,7 +274,7 @@ function Scene(props) {
             height: "100%",
           }}>
         </div>
-        <div id="canvas" >
+        <div id="canvas" className="w-auto h-auto" >
           <canvas
             ref={canvasRef} />
         </div>

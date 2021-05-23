@@ -2,6 +2,9 @@ import React from 'react'
 import logo from '../img/logo.png'
 import { handleSignOut } from '../lib/firebase';
 import PropTypes from 'prop-types'
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -16,21 +19,15 @@ let navigation = [
 ]
 
 export default function NavBar(props) {
+  const {authUser, setAuthUser} = useContext(UserContext);
 
   return (
     <>
       <nav className="bg-gray-900 shadow select-none" role="navigation">
         <div className="container flex flex-wrap items-center p-4 mx-auto md:flex-no-wrap">
-          <div className="mr-3 pointer-events-none md:mr-8">
+          <div className="flex mr-3 pointer-events-none md:mr-8">
             <img width="150" alt="" height="280" className="select-none" src={logo}></img>
-          </div>
-          <div className="ml-auto md:hidden">
-            <button className="flex items-center px-3 py-2 border rounded" type="button">
-              <svg className="w-3 h-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <title>Menu</title>
-                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-              </svg>
-            </button>
+          <div id="welcome-back" className="py-3 text-lg italic text-gray-300 animate-pulse pl-7 md:text-xl"> <span>{authUser != null ? "Welcome " + authUser : "Sign in to continue"}</span></div>
           </div>
           <div className="w-full md:w-auto md:flex-grow md:flex md:items-center">
             <div className=" sm:block sm:ml-6">
@@ -42,6 +39,7 @@ export default function NavBar(props) {
                         props.setShowAddCard(prevState => !prevState)
                       } else if (item.id === "sign-out-nav") {
                         handleSignOut()
+                        setAuthUser(null)
                         props.setUserSignedIn(prevState => !prevState)
                       } else if (item.id === "sign-up-nav") {
                         props.setShowSignUp(prevState => !prevState)
@@ -84,5 +82,6 @@ NavBar.propTypes = {
   setShowAddCard: PropTypes.func,
   setUserSignedIn: PropTypes.func,
   setShowSignUp: PropTypes.func,
-  setShowSignIn: PropTypes.func
+  setShowSignIn: PropTypes.func,
+  displayName: PropTypes.object
 }

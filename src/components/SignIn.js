@@ -1,14 +1,17 @@
-import { handleSignIn } from '../lib/firebase'
-import PropTypes from 'prop-types'
+import { handleSignIn, handleGetDisplayName } from '../lib/firebase';
+import PropTypes from 'prop-types';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
 const SignIn = (props) => {
-  
+  const { authUser, setAuthUser } = useContext(UserContext);
+
   return (
     <>
       <header className=" bg-cover h-full bg-gray-700 z-50 {-- h-screen --} w-full">
         <div className="w-screen px-8 py-2 content">
           <nav className="flex items-center justify-between">
             <div className="flex items-center auth">
-              <button onClick={() => {props.setShowSignIn(prevState => !prevState)}} className="p-2 mr-4 text-gray-200 bg-transparent border border-gray-300 rounded hover:bg-gray-100 hover:text-gray-700">Close</button>
+              <button onClick={() => { props.setShowSignIn(prevState => !prevState) }} className="p-2 mr-4 text-gray-200 bg-transparent border border-gray-300 rounded hover:bg-gray-100 hover:text-gray-700">Close</button>
               <button onClick={() => {
                 props.setShowSignIn(prevState => !prevState)
                 props.setShowSignUp(prevState => !prevState)
@@ -29,9 +32,12 @@ const SignIn = (props) => {
               </div>
               <div className="w-full mt-6 md:max-w-md">
                 <div className="px-4 py-4 mb-6 bg-white rounded-lg shadow-md card ">
-                  <form onSubmit={(event) => {
-                    handleSignIn(event);
+                  <form onSubmit={async (event) => {
+                    await handleSignIn(event);
+                    await setAuthUser(handleGetDisplayName().then((e) => { setAuthUser(e) }))
+                    props.setUserSignedIn(true);
                     props.setShowSignIn(prevState => !prevState);
+
                   }}>
                     <div className="flex items-center justify-center">
                       <h2 className="text-2xl font-bold tracking-wide">
@@ -60,7 +66,9 @@ const SignIn = (props) => {
 
 SignIn.propTypes = {
   setShowSignUp: PropTypes.func,
-  setShowSignIn: PropTypes.func
+  setShowSignIn: PropTypes.func,
+  setUserSignedIn: PropTypes.func,
+  setDisplayName: PropTypes.func
 }
 
 export default SignIn;

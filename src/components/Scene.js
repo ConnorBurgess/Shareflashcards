@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
-import background from '../img/background.jpg'
+import background from '../img/background_alt.jpg'
 // import background_alt from '../img/background_alt.jpg'
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
 import { handleUpdatingFirestoreCards } from '../lib/firebase'
-
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
 function Scene(props) {
@@ -119,7 +118,8 @@ function Scene(props) {
 
   function onMouseMove(event) {
     if (showFollowingCard) {
-      animFollowing(event, props.isMobile);
+      document.getElementById("floating-card").classList.add("pointer-events-none")
+      animFollowing(event, props.isMobile, constraints);
     }
   }
 

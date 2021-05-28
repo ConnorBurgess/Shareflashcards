@@ -1,7 +1,8 @@
 import { gsap } from "gsap";
 
-export const animFollowing = (event, isMobile) => {
+export const animFollowing = (event, isMobile, constraints) => {
   var tl = gsap.timeline()
+  const { width } = constraints;
   tl.set("#card-title", { fontSize: '90% ' });
   tl.set("#card-username", { fontSize: '80% ' });
   tl.set("#card-created-by", { fontSize: '40% ' });
@@ -9,9 +10,15 @@ export const animFollowing = (event, isMobile) => {
   tl.to(document.querySelector('#floating-card'), {
     opacity: 1.0,
     duration: 0.9,
-    scale: 1.0,
-    x: isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 : event.offsetX + 50,
-    y: isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200 : event.offsetY - 200,
+    scale: isMobile && event.touches[0].pageX - event.touches[0].target.offsetLeft + 1 > width / 6.0 ? 1.0
+      : isMobile ? 1.5
+        : event.offsetX > width / 6.0 ? 1.0
+          : 2.0,
+    x: isMobile ? event.offsetX = event.touches[0].pageX - event.touches[0].target.offsetLeft + 1
+      : event.offsetX > width / 1.10 ? event.offsetX - 150
+        : event.offsetX + 50,
+    y: isMobile ? event.offsetY = event.touches[0].pageY - event.touches[0].target.offsetTop - 200
+      : event.offsetY - 200,
     ease: "power4.out",
   })
 
@@ -21,10 +28,10 @@ export const animFollowing = (event, isMobile) => {
   //     if (randNum === 1) {
   //     tl.to(document.querySelector('#floating-card'), {
   //       duration: 0.3,
-        // rotate: 3, 
+  // rotate: 3, 
   //     })
   //   }}, 3500);
-  }
+}
 
 
 export const animEnlarge = (event, isMobile, constraints) => {
@@ -167,7 +174,7 @@ export const animDismiss = (isMobile) => {
 export const animExtendCommandBar = () => {
   const commandBarButtons = document.getElementById("buttons-popup");
   document.getElementById("command-bar-button").disabled = true;
-  
+
   let tl = gsap.timeline();
   tl.from(commandBarButtons, { autoAlpha: 0, xPercent: -75, yPercent: 100 });
   tl.to(commandBarButtons, { autoAlpha: 50, xPercent: 0, duration: 0.3, ease: "Power4.in" });

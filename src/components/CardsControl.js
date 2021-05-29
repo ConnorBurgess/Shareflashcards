@@ -9,20 +9,21 @@ import SavedCards from './SavedCards';
 import InfoPopup from './InfoPopup';
 import FloatingCard from './FloatingCard';
 import { useState, useEffect, useRef, useContext } from 'react';
-import { handleAddCard, handleGetCards, generateDeck, handleSignUp, handleGetDisplayName } from '../lib/firebase';
+import { handleGetCards, generateDeck } from '../lib/firebase';
 import { generateRandomName, deviceDetect } from '../lib/utils'
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-import {UserContext, UserProvider} from '../context/UserContext';
+import { UserContext } from '../context/UserContext';
 gsap.registerPlugin(Draggable);
 
 function CardsControl() {
-  const {authUser, setAuthUser} = useContext(UserContext);
+  const { authUser, setAuthUser } = useContext(UserContext);
   const [showToolTip, setShowToolTip] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
-
+  const [showSavedCards, setShowSavedCards] = useState(false);
+  const [savedCards, setSavedCards] = useState(null);
   //* CardArray all DB cards and currentdeck is intended to hold a smaller sub-deck
   //Todo: CurrentDeck is just a sorted cardArray in current implementation
   const [cardArray, setCardArray] = useState([{}]);
@@ -54,6 +55,7 @@ function CardsControl() {
   const draggableToolTip = useRef(null);
   const draggableSignUp = useRef(null);
   const draggableAddCard = useRef(null);
+  const draggableSavedCards = useRef(null);
   const appBox = useRef(null);
 
 
@@ -66,7 +68,7 @@ function CardsControl() {
             <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title}</h1>
           </div>
           <div id="card-created-by" className="text-center">Card created by</div>
-          <h2 id="card-username" className="mr-2 italic text-center text-bold ">Username</h2>
+          <h2 id="card-username" className="mr-2 italic text-center text-bold ">{clickedCard.data.userName != null ? clickedCard.data.userName : "Tom"}</h2>
           <br />
           <div id="card-front" className="flex ml-2 mr-1 text-black mb-7">
             {clickedCard.data.front}
@@ -79,7 +81,7 @@ function CardsControl() {
             <h1 id="card-title" className="mb-1 font-bold text-green-800">{clickedCard.data.title}</h1>
           </div>
           <div id="card-created-by" className="text-center">Card created by</div>
-          <h2 id="card-username" className="mr-2 italic text-center text-bold sm:mb-1">Username</h2>
+          <h2 id="card-username" className="mr-2 italic text-center text-bold sm:mb-1">{clickedCard.data.userName != null ? clickedCard.data.userName : "Tom"}</h2>
           <br />
           <div id="card-front" className="flex ml-2 mr-1 mb-7">
             {clickedCard.data.back}
@@ -111,6 +113,11 @@ function CardsControl() {
     Draggable.create(draggableToolTip.current, {
       bounds: appBox.current,
       throwProps: true
+    });
+    Draggable.create(draggableSavedCards.current, {
+      bounds: appBox.current,
+      throwProps: true,
+      dragClickables: false
     });
     Draggable.create(draggableAddCard.current, {
       bounds: appBox.current,
@@ -187,81 +194,87 @@ function CardsControl() {
 
   return (
     <>
-      <div ref={appBox}>
-        <div className="absolute z-40 w-full">
-          <NavBar
-            isMobile={isMobile}
-            setShowAddCard={setShowAddCard}
-            userSignedIn={userSignedIn}
-            setUserSignedIn={setUserSignedIn}
-            setShowSignUp={setShowSignUp}
-            setShowSignIn={setShowSignIn}
-          />
-          <div className="z=50 absolute left-1/2 top-3/4">
-            <SavedCards /> </div>
-        </div>
-        <div className="absolute z-50 h-max w-max">
-          {showSignIn ?
-            <SignIn
-              setUserSignedIn={setUserSignedIn}
-              setShowSignIn={setShowSignIn}
-              cardArray={cardArray.length}
-              setShowSignUp={setShowSignUp}
-            />
-            : null}
-        </div>
-        <InfoPopup
-          cardArray={cardArray}
-        />
-        <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
-          {showToolTip ?
-            <ToolTip
-              setShowToolTip={setShowToolTip} /> : null}</div>
-        <div ref={draggableAddCard} className="absolute z-40 w-3/4 md:top-9 left-4 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6">
-          {showAddCard ?
-            <AddCard
-              addCard={handleAddCard}
+      <div className="overflow-hidden">
+        <div className="w-full h-full " ref={appBox}>
+          <div className="absolute z-40 w-full">
+            <div ref={draggableSavedCards} className="z=50 absolute w-11/12  md:top-9 left-2 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6 bg-gray-50 ">
+              {showSavedCards ? 
+              <SavedCards 
+              savedCards={savedCards}
+              setSavedCards={setSavedCards}
+              /> : null} </div>
+            <NavBar
+              isMobile={isMobile}
               setShowAddCard={setShowAddCard}
-            />
-            : null} </div>
-        <div id="veil" className="absolute z-30 w-full h-full bg-gray-800 pointer-events-none opacity-70"></div>
-        <div ref={draggableSignUp} className="absolute z-50 m-20 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
-          {showSignUp ?
-            <SignUp
-              setShowSignUp={setShowSignUp}
-              setUserName={setUserName}
-              setShowToolTip={setShowToolTip}
+              userSignedIn={userSignedIn}
               setUserSignedIn={setUserSignedIn}
-              userName={userName}
-              generateRandomName={generateRandomName} />
-            : null}</div>
-        <div className="z-0">
-          <FloatingCard
-            largeCardDataFront={largeCardDataFront}
-            largeCardDataBack={largeCardDataBack}
-            setCardBackShowing={setCardBackShowing}
-            cardBackShowing={cardBackShowing}
-            showFollowingCard={showFollowingCard}
-          />
-          <Scene
-            isMobile={isMobile}
-            userSignedIn={userSignedIn}
-            setShowSignUp={setShowSignUp}
-            setShowLargeCard={setShowLargeCard}
-            setShowLargeCardBack
-            setCardBackShowing={setCardBackShowing}
-            showLargeCard={showLargeCard}
-            showFollowingCard={showFollowingCard}
-            setFollowingCard={setFollowingCard}
+              setShowSignUp={setShowSignUp}
+              setShowSignIn={setShowSignIn}
+              setShowSavedCards={setShowSavedCards}
+            />
+          </div>
+          <div className="absolute z-50 h-max w-max">
+            {showSignIn ?
+              <SignIn
+                setUserSignedIn={setUserSignedIn}
+                setShowSignIn={setShowSignIn}
+                cardArray={cardArray.length}
+                setShowSignUp={setShowSignUp}
+              />
+              : null}
+          </div>
+          <InfoPopup
             cardArray={cardArray}
-            handleShowingLargeCard={handleShowingLargeCard}
-            cardBackShowing={cardBackShowing}
-            currentDeck={currentDeck}
-            setCurrentDeck={setCurrentDeck}
-            getCards={handleGetCards}
-            generateDeck={generateDeck}
-            setGenerateMoreCards={setGenerateMoreCards}
           />
+          <div ref={draggableToolTip} className="z-50 sm:left-1/3 top-1/4 md:absolute">
+            {showToolTip ?
+              <ToolTip
+                setShowToolTip={setShowToolTip} /> : null}</div>
+          <div ref={draggableAddCard} className="absolute z-40 w-3/4 md:top-9 left-4 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6">
+            {showAddCard ?
+              <AddCard
+                setShowAddCard={setShowAddCard}
+              />
+              : null} </div>
+          <div id="veil" className="absolute z-30 w-full h-full bg-gray-800 pointer-events-none opacity-70"></div>
+          <div ref={draggableSignUp} className="absolute z-50 m-20 lg:left-1/3 md:m-8 lg:top-6 lg:w-1/4 md:w-1/3 sm:w-1/3">
+            {showSignUp ?
+              <SignUp
+                setShowSignUp={setShowSignUp}
+                setUserName={setUserName}
+                setShowToolTip={setShowToolTip}
+                setUserSignedIn={setUserSignedIn}
+                userName={userName}
+                generateRandomName={generateRandomName} />
+              : null}</div>
+          <div className="z-0">
+            <FloatingCard
+              largeCardDataFront={largeCardDataFront}
+              largeCardDataBack={largeCardDataBack}
+              setCardBackShowing={setCardBackShowing}
+              cardBackShowing={cardBackShowing}
+              showFollowingCard={showFollowingCard}
+            />
+            <Scene
+              isMobile={isMobile}
+              userSignedIn={userSignedIn}
+              setShowSignUp={setShowSignUp}
+              setShowLargeCard={setShowLargeCard}
+              setShowLargeCardBack
+              setCardBackShowing={setCardBackShowing}
+              showLargeCard={showLargeCard}
+              showFollowingCard={showFollowingCard}
+              setFollowingCard={setFollowingCard}
+              cardArray={cardArray}
+              handleShowingLargeCard={handleShowingLargeCard}
+              cardBackShowing={cardBackShowing}
+              currentDeck={currentDeck}
+              setCurrentDeck={setCurrentDeck}
+              getCards={handleGetCards}
+              generateDeck={generateDeck}
+              setGenerateMoreCards={setGenerateMoreCards}
+            />
+          </div>
         </div>
       </div>
     </>

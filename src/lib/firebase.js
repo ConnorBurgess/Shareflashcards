@@ -49,8 +49,8 @@ export const handleGetSavedCards = async () => {
       }))
       )
     });
-    const userCards = filterObjsInArr(cardCollection, foundUser.savedCards)
-    return userCards
+    const userCards = filterObjsInArr(cardCollection, foundUser.savedCards);
+    return userCards;
   } catch (err) {
     console.log(err)
   }

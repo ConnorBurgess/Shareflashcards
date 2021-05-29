@@ -1,14 +1,17 @@
 import firebase, { firestore } from '../firebase';
+import { filterObjsInArr } from './utils';
 //* Handles adding a new card to firestore
 export const handleAddCard = (event) => {
   event.preventDefault();
   try {
+    console.log(event);
     firestore.collection("cards")
       .add({
         title: event.target.title.value,
         front: event.target.front.value,
         back: event.target.back.value,
-        created: firebase.firestore.FieldValue.serverTimeStamp
+        userName: event.target.userName.value,
+        // created: firebase.firestore.FieldValue.serverTimeStamp
       })
   } catch (err) {
     console.log(err)
@@ -32,9 +35,30 @@ export const handleGetCards = async () => {
   }
 }
 
+
+//* Handles GET saved cards for user
+export const handleGetSavedCards = async () => {
+  try {
+    const currentUser = await firebase.auth().currentUser;
+    const foundUser = await firestore.collection("users").doc(currentUser.uid).get().then((docRef) => { return docRef.data() })
+      .catch((error) => { });
+    const cardCollection = await firestore.collection("cards").get().then((entry) => {
+      return (entry.docs.map(x => ({
+        id: x.id,
+        data: x.data()
+      }))
+      )
+    });
+    const userCards = filterObjsInArr(cardCollection, foundUser.savedCards)
+    return userCards
+  } catch (err) {
+    console.log(err)
+  }
+}
 export const handleGetDisplayName = async () => {
   try {
     const currentUser = await firebase.auth().currentUser;
+    console.log(currentUser);
     if (currentUser !== null) {
       return await currentUser.displayName
     }
@@ -83,6 +107,7 @@ export const handleSignUp = async newUser => {
 //* Handles sign in
 export const handleSignIn = async (event) => {
   console.log(event);
+  event.preventDefault();
   await firebase.auth().signInWithEmailAndPassword(event.target.email.value, event.target.password.value)
     // .then((userCredential) => {
     //   var user = userCredential.user;

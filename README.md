@@ -1,5 +1,5 @@
 # Shareflashcards
-<img src="./src/img/preview.gif"> </br>
+<img src="./src/img/preview_2.gif"> </br>
 #### Created By: Connor Burgess 
 * * *
 * Not all features and UI buttons currently implemented
@@ -17,13 +17,13 @@ Responsive web application allowing users to contribute flash cards to community
 * As a user, I want to be able to review cards in saved decks.
 
 ## Technologies used
-* JavaScript
 * React
 * Matter.js
-* HTML
-* CSS
+* JavaScript
 * Tailwind
 * GSAP
+* HTML
+* CSS
 * npm
 * Better Comments
 * Adobe Stock Assets
@@ -48,7 +48,7 @@ Responsive web application allowing users to contribute flash cards to community
 | Responsiveness issues with floating card | Need to adjust tailwind classes on floating card and play with media queries | Fix floating card | ❌  **Current**|
 | Responsiveness issues with matter scene on some screen sizes | Body generation needs to be tweaked | Fix Matter scene.js | ❌  **Current**|
 | Input validation needs to be added to forms | Add input validation | Implement | ❌  **Current**|
-| Large card frozen if user clicks matter card before logging in | Add user auth checks to mouseConstraint | Fix matter scene.js | ❌  **Current**|
+| Large card frozen if user clicks matter card before logging in | Add user auth checks to mouseConstraint | Fix matter scene.js | ✔️  **Fixed**|
 
 
 ## License:

@@ -5,15 +5,19 @@ import background_alt from '../img/background_alt.jpg'
 import background_alt_2 from '../img/background_alt_2.jpg'
 import background_alt_3 from '../img/background_alt_3.jpg'
 import background_alt_4 from '../img/background_alt_4.jpg'
-
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
 import { handleUpdatingFirestoreCards } from '../lib/firebase'
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+
+
 //! Current scene.js still needs to be broken up into smaller components and refactored
 //Todo: Refactor and reorganize code
 function Scene(props) {
-
+  const { authUser, setAuthUser } = useContext(UserContext);
+  console.log(authUser);
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
@@ -74,7 +78,6 @@ function Scene(props) {
           group: 0,
           category: 1,
           mask: 1,
-          restitituion: 1,
         }, id: ""
       }),
     ]);
@@ -194,8 +197,8 @@ function Scene(props) {
         chamfer: { radius: 1 },
         density: 0.2,
         force: { x: 2, y: 3 },
-        restitituion: 0.6,
-        frictionAir: 0.001,
+        restitituion: 0.9,
+        // frictionAir: 0.001,
         collisionFilter: {
           group: 0,
           category: 1,
@@ -236,7 +239,7 @@ function Scene(props) {
 
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
-        if (getClickedBody.length !== 0 && cardArray.length > 1 && getClickedBody !== undefined) {
+        if (getClickedBody.length !== 0 && cardArray.length > 1 && getClickedBody !== undefined && authUser != undefined) {
           props.setFollowingCard(true);
           let matterCardId = getClickedBody[0].id
           setMatterCardId(matterCardId)

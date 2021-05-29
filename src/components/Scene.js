@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Matter from "matter-js";
-import background from '../img/background_alt.jpg'
-// import background_alt from '../img/background_alt.jpg'
+import background from '../img/background.jpg'
+import background_alt from '../img/background_alt.jpg'
+import background_alt_2 from '../img/background_alt_2.jpg'
+import background_alt_3 from '../img/background_alt_3.jpg'
+import background_alt_4 from '../img/background_alt_4.jpg'
+
 import blank_card_small from '../img/blank_card_small.jpg'
 import PropTypes from "prop-types";
 import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
@@ -45,6 +49,7 @@ function Scene(props) {
 
     setEngine(engine);
 
+    let bgroundRand = Math.floor(Math.random() * 5) + 1;
     let render = Render.create({
       element: boxRef.current,
       engine: engine,
@@ -54,7 +59,11 @@ function Scene(props) {
         showIds: false,
         width: window.innerWidth,
         height: window.innerHeight,
-        background: background,
+        background: bgroundRand === 1 ? background
+          : bgroundRand === 2 ? background_alt
+            : bgroundRand === 3 ? background_alt_2
+              : bgroundRand === 4 ? background_alt_3
+                : background_alt_4,
         wireframes: false,
       },
     })

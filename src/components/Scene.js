@@ -6,6 +6,7 @@ import background_alt_2 from '../img/background_alt_2.jpg'
 import background_alt_3 from '../img/background_alt_3.jpg'
 import background_alt_4 from '../img/background_alt_4.jpg'
 import blank_card_small from '../img/blank_card_small.jpg'
+import logo_small from '../img/logo_small.png'
 import PropTypes from "prop-types";
 import { animFollowing, animEnlarge, animSave, animDismiss, animExtendCommandBar, animHideCommandBar } from '../lib/gsap'
 import { handleUpdatingFirestoreCards } from '../lib/firebase'
@@ -17,7 +18,6 @@ import { UserContext } from '../context/UserContext';
 //Todo: Refactor and reorganize code
 function Scene(props) {
   const { authUser, setAuthUser } = useContext(UserContext);
-  console.log(authUser);
   const [mEngine, setEngine] = useState(null);
   const [mMouseConstraint, setMouseConstraint] = useState(null);
   const [mGravity, setGravity] = useState(true);
@@ -39,7 +39,6 @@ function Scene(props) {
   const { cardArray, currentDeck, showFollowingCard, showLargeCard } = props;
 
   useEffect(() => {
-
     //* Core matter engine / canvas initialization
     const Engine = Matter.Engine,
       Render = Matter.Render,
@@ -123,10 +122,73 @@ function Scene(props) {
   }, [scene, constraints])
 
   useEffect(() => {
+    if (mEngine !== null) {
+      setTimeout(() => { 
+      Matter.Composite.add(mEngine.world,  [Matter.Bodies.rectangle(constraints.width / 3, 0, 260, 120, {
+        isStatic: false,
+        // angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
+        chamfer: { radius: 1 },
+        friction: 1,
+        restitituion: 1.0,
+        density: 0.9,
+        force: { x: 0, y: 12351 },
+        // frictionAir: 0.001,
+        collisionFilter: {
+          group: 0,
+          category: 1,
+          mask: 1
+        },
+        render: {
+          fillStyle: '#374151',
+          strokeStyle: '#968786',
+          chamfer: { radius: 9 },
+          lineWidth: 2,
+          sprite: {
+            texture: logo_small,
+          }
+        },
+      })]);
+    },3000)
+      for (let i = 0; props.isMobile ? i < 250 : i < 400; i++) {
+        Matter.Composite.add(mEngine.world,  [Matter.Bodies.rectangle(props.isMobile ? Math.random() * 400 + 1 : Math.random() * 1000 + 1 , 0, 37, 54, {
+          isStatic: false,
+          angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
+          chamfer: { radius: 1 },
+          friction: 0.7,
+          density: 0.2,
+          force: { x: 2, y: 3 },
+          restitituion: 0.9,
+          // frictionAir: 0.001,
+          collisionFilter: {
+            group: 0,
+            category: 1,
+            mask: 1
+          },
+          render: {
+            fillStyle: '#374151',
+            strokeStyle: '#968786',
+            chamfer: { radius: 9 },
+            lineWidth: 2,
+            sprite: {
+              texture: blank_card_small,
+            }
+          },
+        })]);
+      }
+
+    }
     return () => {
       window.removeEventListener('resize', handleResize)
     }
-  }, [])
+  }, [mEngine])
+
+  useEffect(() => {
+    if (props.userSignedIn) {
+      for (let i = 0; i < 10; i++ ) { 
+      mEngine.world.bodies.forEach(element => { if (element.id !== "") { Matter.Composite.removeBody(mEngine.world, element) } });
+    }
+    }
+  }, [props.userSignedIn])
 
   function onMouseMove(event) {
     if (showFollowingCard) {
@@ -151,9 +213,11 @@ function Scene(props) {
   //* Actions for dismissing / saving large card, 
   //Todo: Improve coords of animations
   useEffect(() => {
-    if (!props.userSignedIn) {
-      props.setShowSignUp(prevState => !prevState)
-    }
+    // if (!props.userSignedIn) {
+    //   setTimeout(() => { 
+    //   props.setShowSignUp(prevState => !prevState)
+    // },7500)
+    // }
     if (mMouseConstraint !== null) {
       Matter.Events.off(mMouseConstraint, "mouseup")
     }
@@ -161,10 +225,10 @@ function Scene(props) {
       props.setCardBackShowing(false);
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         document.getElementById("floating-card").classList.add("pointer-events-none")
-        handleUpdatingFirestoreCards(matterCard)
         Matter.Events.off(mMouseConstraint, "mousedown")
         props.setShowLargeCard(false);
         if (event.source.constraint.pointA.x > constraints.width / 2) {
+          handleUpdatingFirestoreCards(matterCard)
           animSave(props.isMobile);
         }
         else {
@@ -191,10 +255,11 @@ function Scene(props) {
   useEffect(() => {
 
     const generateMatterCard = () => {
-      return Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(Math.random() * 1000 + 1, 0, 37, 54, {
+      return Matter.Composite.add(mEngine.world, [Matter.Bodies.rectangle(props.isMobile ? Math.random() * 400 + 1 : Math.random() * 1000 + 1 , 0, 37, 54, {
         isStatic: false,
         angle: (Math.floor(Math.random() * (6.28 * 100 - 1 * 100) + 1 * 100) / (1 * 100)), //! Angle is in radians. Randomizes between 0 and 6.28
         chamfer: { radius: 1 },
+        friction: 0.7,
         density: 0.2,
         force: { x: 2, y: 3 },
         restitituion: 0.9,
@@ -233,9 +298,11 @@ function Scene(props) {
   //* Handle adding floating div to mouse movement
   //Todo: Move to mouse constraint component
   useEffect(() => {
+    console.log(showLargeCard);
+    console.log(cardArray);
 
     //* Add floating div movement event 
-    if (mMouseConstraint !== null && mEngine !== null && cardArray !== undefined) {
+    if (mMouseConstraint !== null && mEngine !== null && cardArray !== undefined && !showLargeCard) {
 
       Matter.Events.on(mMouseConstraint, "mousedown", (event) => {
         let getClickedBody = Matter.Query.point(mEngine.world.bodies, event.mouse.position);
@@ -270,7 +337,7 @@ function Scene(props) {
     <>
       <div id="scene" className="relative flex justify-center">
         <div id="command-bar" className="fixed bottom-0 left-0 flex h-16 p-3 mx-auto bg-gray-900 border-gray-300 shadow-md space rounded-br-md">
-          <button id="command-bar-button" onClick={() => { extendCommandBar(); }} className="mr-4"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
+          <button id="command-bar-button" onClick={() => { extendCommandBar(); }} className="mr-4 select-none"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAUUlEQVRIS+2USQoAMAgDzf8fnZ67UA9lBKGeq5MFqoBH8P34gDTh+ohsO5V1eSBpEr05wAEv6k+79R3gDvAOcAAeUX8A3gEO6N/Bd7AmgP+mA2tUGBlfaHSyAAAAAElFTkSuQmCC" /></button>
           <div>
             <div id="buttons-popup" className="fixed bottom-0 inline-block w-full h-16 bg-gray-900 opacity-0">
               <button className="z-10 m-2 text-white transform outline-none select-none text-bold hover:scale-105 " onClick={() => setGravity(prevState => !prevState)}> Gravity</button>

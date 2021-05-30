@@ -9,12 +9,11 @@ import SavedCards from './SavedCards';
 import InfoPopup from './InfoPopup';
 import FloatingCard from './FloatingCard';
 import { useState, useEffect, useRef, useContext } from 'react';
+import { makeComponentsDraggable } from '../lib/draggable';
 import { handleGetCards, generateDeck } from '../lib/firebase';
 import { generateRandomName, deviceDetect } from '../lib/utils'
 import { gsap } from "gsap";
-import { Draggable } from "gsap/Draggable";
 import { UserContext } from '../context/UserContext';
-gsap.registerPlugin(Draggable);
 
 function CardsControl() {
   const { authUser, setAuthUser } = useContext(UserContext);
@@ -55,7 +54,6 @@ function CardsControl() {
   const draggableToolTip = useRef(null);
   const draggableSignUp = useRef(null);
   const draggableAddCard = useRef(null);
-  const draggableSavedCards = useRef(null);
   const appBox = useRef(null);
 
 
@@ -94,10 +92,10 @@ function CardsControl() {
   useEffect(() => {
     const veil = document.getElementById("veil");
     var tl = gsap.timeline()
-    if (showAddCard || showToolTip || showSignUp || showSignIn || showLargeCard) {
+    if (showAddCard || showToolTip || showSignUp || showSignIn || showLargeCard || showSavedCards) {
       tl.to(veil, {
         duration: 2.0,
-        autoAlpha: 0.44
+        autoAlpha: 0.74
       })
     }
     else {
@@ -106,35 +104,17 @@ function CardsControl() {
         autoAlpha: 0
       })
     }
-  }, [showToolTip, showAddCard, showSignUp, showSignIn, showLargeCard]);
+  }, [showToolTip, showAddCard, showSignUp, showSignIn, showLargeCard, showSavedCards]);
 
   //* Components draggable upon mount
   useEffect(() => {
-    Draggable.create(draggableToolTip.current, {
-      bounds: appBox.current,
-      throwProps: true
-    });
-    Draggable.create(draggableSavedCards.current, {
-      bounds: appBox.current,
-      throwProps: true,
-      dragClickables: false
-    });
-    Draggable.create(draggableAddCard.current, {
-      bounds: appBox.current,
-      throwProps: true,
-      dragClickables: false
-    });
-    Draggable.create(draggableSignUp.current, {
-      bounds: appBox.current,
-      throwProps: true,
-      dragClickables: false
-    }, []);
+    makeComponentsDraggable(appBox, draggableToolTip, draggableAddCard, draggableSignUp);
 
     //* Fetch firestore data on mount
     const fetchData = async () => {
-      const cardCollection = await handleGetCards();
-      setCardArray(cardCollection);
-      if (authUser != null) {
+      if (authUser !== undefined && cardArray.length <= 1) {
+        const cardCollection = await handleGetCards();
+        setCardArray(cardCollection);
         setUserSignedIn(true);
         document.getElementById("sign-up-nav").classList.add("hidden")
         document.getElementById("sign-in-nav").classList.add("hidden")
@@ -148,7 +128,7 @@ function CardsControl() {
     }
     fetchData();
     setIsMobile(deviceDetect());
-  }, []);
+  }, [userSignedIn]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -169,9 +149,19 @@ function CardsControl() {
       document.getElementById("sign-up-nav").classList.add("hidden")
       document.getElementById("sign-in-nav").classList.add("hidden")
       document.getElementById("sign-out-nav").classList.remove("hidden")
+      document.getElementById("saved-nav").classList.remove("hidden")
+      document.getElementById("profile-nav").classList.remove("hidden")
+      document.getElementById("explore-nav").classList.remove("hidden")
+      document.getElementById("new-nav").classList.remove("hidden")
+
     }
     else {
       document.getElementById("sign-out-nav").classList.add("hidden")
+      document.getElementById("saved-nav").classList.add("hidden")
+      document.getElementById("profile-nav").classList.add("hidden")
+      document.getElementById("explore-nav").classList.add("hidden")
+      document.getElementById("new-nav").classList.add("hidden")
+
       document.getElementById("sign-up-nav").classList.remove("hidden")
       document.getElementById("sign-in-nav").classList.remove("hidden")
       setUserSignedIn(false);
@@ -197,12 +187,6 @@ function CardsControl() {
       <div className="overflow-hidden">
         <div className="w-full h-full " ref={appBox}>
           <div className="absolute z-40 w-full">
-            <div ref={draggableSavedCards} className="z=50 absolute w-11/12  md:top-9 left-2 md:left-1/4 drag sm:w-1/2 sm:top-0 top-6 bg-gray-50 ">
-              {showSavedCards ? 
-              <SavedCards 
-              savedCards={savedCards}
-              setSavedCards={setSavedCards}
-              /> : null} </div>
             <NavBar
               isMobile={isMobile}
               setShowAddCard={setShowAddCard}
@@ -212,6 +196,12 @@ function CardsControl() {
               setShowSignIn={setShowSignIn}
               setShowSavedCards={setShowSavedCards}
             />
+            <div className="z=50 absolute w-11/12 top-15 left-2 md:left-1/4 drag sm:w-1/2 bg-gray-50 ">
+              {showSavedCards ?
+                <SavedCards
+                  savedCards={savedCards}
+                  setSavedCards={setSavedCards}
+                /> : null} </div>
           </div>
           <div className="absolute z-50 h-max w-max">
             {showSignIn ?
